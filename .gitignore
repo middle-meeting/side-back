@@ -35,3 +35,23 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### 실행 파일 ###
+*.log
+*.pid
+*.jar
+*.war
+
+### 민감 설정 파일 ###
+application*.yml
+application*.properties
+.env
+
+### OS 잔여 파일 ###
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+### 테스트 리포트 ###
+test-output/
+
