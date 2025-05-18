@@ -1,4 +1,4 @@
-package com.iny.side.domain.entity;
+package com.iny.side.users.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

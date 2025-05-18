@@ -1,6 +1,6 @@
-package com.iny.side.users.controller;
+package com.iny.side.users.web.controller;
 
-import com.iny.side.domain.dto.AccountDto;
+import com.iny.side.users.web.dto.AccountDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;

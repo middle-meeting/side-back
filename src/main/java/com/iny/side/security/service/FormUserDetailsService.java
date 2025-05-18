@@ -1,9 +1,9 @@
 package com.iny.side.security.service;
 
-import com.iny.side.domain.dto.AccountDto;
-import com.iny.side.domain.entity.Account;
-import com.iny.side.users.repository.UserRepository;
-import com.iny.side.domain.dto.AccountContext;
+import com.iny.side.users.domain.entity.Account;
+import com.iny.side.users.web.dto.AccountDto;
+import com.iny.side.users.infrastructure.repository.UserRepository;
+import com.iny.side.users.web.dto.AccountContext;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;

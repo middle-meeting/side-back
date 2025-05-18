@@ -1,6 +1,6 @@
 package com.iny.side.security.provider;
 
-import com.iny.side.domain.dto.AccountContext;
+import com.iny.side.users.web.dto.AccountContext;
 import com.iny.side.security.details.FormAuthenticationDetails;
 import com.iny.side.security.exception.SecretException;
 import lombok.RequiredArgsConstructor;

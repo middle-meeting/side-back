@@ -1,4 +1,4 @@
-package com.iny.side.domain.dto;
+package com.iny.side.users.web.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

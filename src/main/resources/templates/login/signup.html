@@ -104,10 +104,6 @@
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     <div class="form-group">
-                        <label for="age">Age</label>
-                        <input type="number" class="form-control" id="age" name="age" required>
-                    </div>
-                    <div class="form-group">
                         <label for="role">Authority</label>
                         <select class="form-control" id="role" name="role">
                             <option th:each="r : ${T(com.iny.side.domain.entity.Role).values()}"
