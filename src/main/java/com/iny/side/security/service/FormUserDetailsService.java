@@ -1,9 +1,9 @@
 package com.iny.side.security.service;
 
 import com.iny.side.users.domain.entity.Account;
-import com.iny.side.users.web.dto.AccountDto;
-import com.iny.side.users.infrastructure.repository.UserRepository;
+import com.iny.side.users.infrastructure.repository.UserJpaRepository;
 import com.iny.side.users.web.dto.AccountContext;
+import com.iny.side.users.web.dto.AccountDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,19 +19,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FormUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account account = userRepository.findByUsername(username);
-        if (account == null) {
-            throw new UsernameNotFoundException("No user found with username: " + username);
-        }
+        Account account = userJpaRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with username: " + username));
 
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(account.getRole().getRoleName()));
 
-        ModelMapper mapper = new ModelMapper();
-        AccountDto accountDto = mapper.map(account, AccountDto.class);
+        AccountDto accountDto = AccountDto.from(account);
 
         return new AccountContext(accountDto, authorities);
     }

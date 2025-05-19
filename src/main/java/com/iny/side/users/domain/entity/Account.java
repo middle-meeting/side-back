@@ -1,7 +1,7 @@
 package com.iny.side.users.domain.entity;
 
 import com.iny.side.users.domain.Role;
-import com.iny.side.users.web.dto.AccountDto;
+import com.iny.side.users.web.dto.SignupDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -34,10 +34,11 @@ public class Account {
         this.role = role;
     }
 
-    public static Account from(AccountDto accountDto, String cryptedPassword) {
-        return Account.builder().id(accountDto.getId())
+    public static Account from(SignupDto signupDto, String cryptedPassword) {
+        return Account.builder()
                 .password(cryptedPassword)
-                .username(accountDto.getUsername())
-                .role(accountDto.getRole()).build();
+                .username(signupDto.username())
+                .role(signupDto.role())
+                .build();
     }
 }

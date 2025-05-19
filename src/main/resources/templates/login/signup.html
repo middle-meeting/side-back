@@ -106,7 +106,7 @@
                     <div class="form-group">
                         <label for="role">Authority</label>
                         <select class="form-control" id="role" name="role">
-                            <option th:each="r : ${T(com.iny.side.domain.entity.Role).values()}"
+                            <option th:each="r : ${T(com.iny.side.users.domain.Role).values()}"
                                     th:value="${r.name()}"
                                     th:text="${r.label}"></option>
                         </select>

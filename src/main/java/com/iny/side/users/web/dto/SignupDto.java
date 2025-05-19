@@ -5,10 +5,9 @@ import com.iny.side.users.domain.entity.Account;
 import lombok.Builder;
 
 @Builder
-public record AccountDto(long id, String username, String password, Role role) {
-    public static AccountDto from(Account account) {
-        return AccountDto.builder()
-                .id(account.getId())
+public record SignupDto(String username, String password, Role role) {
+    public static SignupDto from(Account account) {
+        return SignupDto.builder()
                 .username(account.getUsername())
                 .password(account.getPassword())
                 .role(account.getRole())

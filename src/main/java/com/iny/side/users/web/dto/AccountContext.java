@@ -22,12 +22,12 @@ public class AccountContext implements UserDetails {
 
     @Override
     public String getPassword() {
-        return accountDto.getPassword();
+        return accountDto.password();
     }
 
     @Override
     public String getUsername() {
-        return accountDto.getUsername();
+        return accountDto.username();
     }
 
     @Override
