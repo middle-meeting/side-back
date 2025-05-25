@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "account_id", updatable = false, nullable = false)
     private Long id;
 
     @Column(name = "username", unique = true, nullable = false)
@@ -22,15 +23,19 @@ public class Account {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Builder
-    public Account(Long id, String username, String password, Role role) {
+    public Account(Long id, String username, String password, String name, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.name = name;
         this.role = role;
     }
 
@@ -38,6 +43,7 @@ public class Account {
         return Account.builder()
                 .password(cryptedPassword)
                 .username(signupDto.username())
+                .name(signupDto.name())
                 .role(signupDto.role())
                 .build();
     }

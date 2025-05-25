@@ -17,12 +17,17 @@ public class HomeController {
     }
 
     @GetMapping(value = "/professor")
-    public String manager() {
+    public String professor() {
         return "/professor";
     }
 
     @GetMapping(value = "/admin")
     public String admin() {
         return "/admin";
+    }
+
+    @GetMapping(value = "/api")
+    public String restDashboard() {
+        return "/rest/dashboard";
     }
 }

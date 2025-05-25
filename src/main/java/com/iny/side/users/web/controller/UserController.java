@@ -1,7 +1,6 @@
 package com.iny.side.users.web.controller;
 
 import com.iny.side.users.application.service.UserService;
-import com.iny.side.users.web.dto.AccountDto;
 import com.iny.side.users.web.dto.SignupDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

@@ -1,8 +1,9 @@
 package com.iny.side.users.application.service;
 
 import com.iny.side.users.domain.entity.Account;
-import com.iny.side.users.infrastructure.repository.UserJpaRepository;
+import com.iny.side.users.domain.repository.UserRepository;
 import com.iny.side.users.web.dto.SignupDto;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,11 +14,19 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
-    private final UserJpaRepository userJpaRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
-    public void createUser(SignupDto signupDto) {
-        userJpaRepository.save(Account.from(signupDto, passwordEncoder.encode(signupDto.password())));
+    public Account createUser(SignupDto signupDto) {
+        if (existsByUsername(signupDto.username())) {
+            throw new DuplicateRequestException(signupDto.username());
+        }
+        return userRepository.save(Account.from(signupDto, passwordEncoder.encode(signupDto.password())));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 }
