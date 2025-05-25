@@ -1,7 +1,6 @@
 package com.iny.side.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iny.side.users.web.dto.AccountDto;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

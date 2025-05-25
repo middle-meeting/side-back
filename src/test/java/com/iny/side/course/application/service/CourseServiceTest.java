@@ -55,10 +55,10 @@ class CourseServiceTest {
                 .name("박관리")
                 .role(Role.ADMIN)
                 .build();
-        김학생 = fakeUserRepository.save(김학생);
-        이교수 = fakeUserRepository.save(이교수);
-        왕선생 = fakeUserRepository.save(왕선생);
-        박관리 = fakeUserRepository.save(박관리);
+        fakeUserRepository.save(김학생);
+        fakeUserRepository.save(이교수);
+        fakeUserRepository.save(왕선생);
+        fakeUserRepository.save(박관리);
 
         Course 신경학 = Course.builder()
                 .name("신경학")

@@ -1,6 +1,5 @@
 package com.iny.side.account.mock;
 
-import com.iny.side.course.domain.entity.Course;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.domain.repository.UserRepository;
 
