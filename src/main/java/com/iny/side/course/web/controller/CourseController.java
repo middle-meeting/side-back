@@ -20,7 +20,7 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @GetMapping(value = "/professor/my-course")
+    @GetMapping(value = "/professor/courses")
     public ResponseEntity<BasicResponse<MyCoursesDto>> myCourse(
             @AuthenticationPrincipal AccountResponseDto accountResponseDto,
             @RequestParam(value = "semester") String semester) {

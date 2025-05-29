@@ -1,9 +1,9 @@
 package com.iny.side.users.application.service;
 
+import com.iny.side.common.exception.DuplicateUsernameException;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.domain.repository.UserRepository;
 import com.iny.side.users.web.dto.SignupDto;
-import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Account createUser(SignupDto signupDto) {
         if (existsByUsername(signupDto.username())) {
-            throw new DuplicateRequestException(signupDto.username());
+            throw new DuplicateUsernameException(signupDto.username());
         }
         return userRepository.save(Account.from(signupDto, passwordEncoder.encode(signupDto.password())));
     }

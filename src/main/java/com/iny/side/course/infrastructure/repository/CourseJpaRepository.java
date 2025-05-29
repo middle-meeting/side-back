@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CourseJpaRepository extends JpaRepository<Course, Long> {
     List<Course> findAllByAccountIdAndSemester(Long accountId, String semester);
+
 }

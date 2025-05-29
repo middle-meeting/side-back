@@ -1,0 +1,81 @@
+package com.iny.side.assignment.domain.entity;
+
+import com.iny.side.course.domain.entity.Course;
+import com.iny.side.users.domain.entity.Account;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Assignment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "assignment_id", updatable = false, nullable = false)
+    private Long id;
+
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "persona_name", nullable = false)
+    private String personalName;
+
+    @Column(name = "persona_age", nullable = false)
+    private Integer personalAge;
+
+    @Column(name = "persona_gender", nullable = false)
+    private String personalGender;
+
+    @Column(name = "persona_symptom", nullable = false)
+    private String personalSymptom;
+
+    @Column(name = "persona_history")
+    private String personalHistory;
+
+    @Column(name = "persona_personality")
+    private String personalPersonality;
+
+    @Column(name = "persona_disease", nullable = false)
+    private String personaDisease;
+
+    @Column(name = "objective", nullable = false)
+    private String objective;
+
+    @Column(name = "max_turns", nullable = false)
+    private Integer maxTurns;
+
+    @Column(name = "due_date", nullable = false)
+    private LocalDateTime dueDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id")
+    private Account account;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private Course course;
+
+    @Builder
+    public Assignment(Long id, String title, String personalName, Integer personalAge, String personalGender, String personalSymptom, String personalHistory, String personalPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Account account, Course course) {
+        this.id = id;
+        this.title = title;
+        this.personalName = personalName;
+        this.personalAge = personalAge;
+        this.personalGender = personalGender;
+        this.personalSymptom = personalSymptom;
+        this.personalHistory = personalHistory;
+        this.personalPersonality = personalPersonality;
+        this.personaDisease = personaDisease;
+        this.objective = objective;
+        this.maxTurns = maxTurns;
+        this.dueDate = dueDate;
+        this.account = account;
+        this.course = course;
+    }
+}
