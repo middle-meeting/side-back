@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
+
 class CourseServiceTest {
 
     private CourseService courseService;
@@ -98,15 +100,15 @@ class CourseServiceTest {
 
         // then
         // 1. 조회된 과목 수
-        Assertions.assertThat(result).hasSize(2);
+        assertThat(result).hasSize(2);
         // 2. 모든 과목이 해당 교수의 것인지
-        Assertions.assertThat(result)
+        assertThat(result)
                 .allMatch(course -> course.professorName().equals(dto.name()));
         // 3. 모든 과목이 해당 학기인지
-        Assertions.assertThat(result)
+        assertThat(result)
                 .allMatch(course -> course.semester().equals(semester));
         // 4. 과목명이 기대값에 포함되는지
-        Assertions.assertThat(result)
+        assertThat(result)
                 .extracting(MyCoursesDto::name)
                 .containsExactlyInAnyOrder("한의학 입문", "인체학 입문");
     }

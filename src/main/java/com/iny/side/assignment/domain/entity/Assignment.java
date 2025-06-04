@@ -1,5 +1,6 @@
 package com.iny.side.assignment.domain.entity;
 
+import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.users.domain.entity.Account;
 import jakarta.persistence.*;
@@ -24,22 +25,22 @@ public class Assignment {
     private String title;
 
     @Column(name = "persona_name", nullable = false)
-    private String personalName;
+    private String personaName;
 
     @Column(name = "persona_age", nullable = false)
-    private Integer personalAge;
+    private Integer personaAge;
 
     @Column(name = "persona_gender", nullable = false)
-    private String personalGender;
+    private GenderType personaGender;
 
     @Column(name = "persona_symptom", nullable = false)
-    private String personalSymptom;
+    private String personaSymptom;
 
     @Column(name = "persona_history")
-    private String personalHistory;
+    private String personaHistory;
 
     @Column(name = "persona_personality")
-    private String personalPersonality;
+    private String personaPersonality;
 
     @Column(name = "persona_disease", nullable = false)
     private String personaDisease;
@@ -62,15 +63,15 @@ public class Assignment {
     private Course course;
 
     @Builder
-    public Assignment(Long id, String title, String personalName, Integer personalAge, String personalGender, String personalSymptom, String personalHistory, String personalPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Account account, Course course) {
+    public Assignment(Long id, String title, String personaName, Integer personaAge, GenderType personaGender, String personaSymptom, String personaHistory, String personaPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Account account, Course course) {
         this.id = id;
         this.title = title;
-        this.personalName = personalName;
-        this.personalAge = personalAge;
-        this.personalGender = personalGender;
-        this.personalSymptom = personalSymptom;
-        this.personalHistory = personalHistory;
-        this.personalPersonality = personalPersonality;
+        this.personaName = personaName;
+        this.personaAge = personaAge;
+        this.personaGender = personaGender;
+        this.personaSymptom = personaSymptom;
+        this.personaHistory = personaHistory;
+        this.personaPersonality = personaPersonality;
         this.personaDisease = personaDisease;
         this.objective = objective;
         this.maxTurns = maxTurns;
