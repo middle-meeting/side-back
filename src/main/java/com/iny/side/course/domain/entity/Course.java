@@ -1,5 +1,6 @@
 package com.iny.side.course.domain.entity;
 
+import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.users.domain.entity.Account;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,5 +34,11 @@ public class Course {
         this.name = name;
         this.semester = semester;
         this.account = account;
+    }
+
+    public void validateOwner(Long professorId) {
+        if (!this.account.getId().equals(professorId)) {
+            throw new ForbiddenException("본인의 강의가 아닙니다.");
+        }
     }
 }

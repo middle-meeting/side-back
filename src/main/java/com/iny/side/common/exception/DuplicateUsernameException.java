@@ -1,7 +1,9 @@
 package com.iny.side.common.exception;
 
-public class DuplicateUsernameException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class DuplicateUsernameException extends BusinessException {
     public DuplicateUsernameException(String username) {
-        super(username + " already exists");
+        super(username + " already exists", HttpStatus.BAD_REQUEST);
     }
 }

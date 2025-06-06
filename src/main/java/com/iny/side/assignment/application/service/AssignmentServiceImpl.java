@@ -1,9 +1,9 @@
 package com.iny.side.assignment.application.service;
 
+import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentResponseDto;
-import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.repository.CourseRepository;
@@ -35,15 +35,13 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Transactional
     public AssignmentResponseDto create(Long courseId, Long professorId, AssignmentCreateDto assignmentCreateDto) {
         Course course = validateProfessorOwnsCourse(courseId, professorId);
-        return AssignmentResponseDto.from(assignmentRepository.save(assignmentCreateDto.to(course)));
+        return AssignmentResponseDto.from(assignmentRepository.save(Assignment.create(course, assignmentCreateDto)));
     }
 
     private Course validateProfessorOwnsCourse(Long courseId, Long professorId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new NotFoundException("Course", courseId));
-        if (!course.getAccount().getId().equals(professorId)) {
-            throw new ForbiddenException("본인의 강의가 아닙니다.");
-        }
+        course.validateOwner(professorId);
         return course;
     }
 }

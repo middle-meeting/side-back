@@ -1,5 +1,7 @@
 package com.iny.side.assignment.domain.entity;
 
+import com.iny.side.assignment.exception.InvalidAssignmentDueDateException;
+import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.users.domain.entity.Account;
@@ -78,5 +80,27 @@ public class Assignment {
         this.dueDate = dueDate;
         this.account = account;
         this.course = course;
+    }
+
+    public static Assignment create(Course course, AssignmentCreateDto dto) {
+        if (dto.dueDate().getMinute() % 30 != 0 || dto.dueDate().getSecond() != 0 || dto.dueDate().getNano() != 0) {
+            throw new InvalidAssignmentDueDateException();
+        }
+
+        return Assignment.builder()
+                .title(dto.title())
+                .personaName(dto.personaName())
+                .personaAge(dto.personaAge())
+                .personaGender(dto.personaGender())
+                .personaSymptom(dto.personaSymptom())
+                .personaHistory(dto.personaHistory())
+                .personaPersonality(dto.personaPersonality())
+                .personaDisease(dto.personaDisease())
+                .objective(dto.objective())
+                .maxTurns(dto.maxTurns())
+                .dueDate(dto.dueDate())
+                .account(course.getAccount())
+                .course(course)
+                .build();
     }
 }

@@ -37,4 +37,43 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<BasicResponse<?>> handleBusinessException(BusinessException ex) {
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .code("BUSINESS_ERROR")
+                .message(ex.getMessage())
+                .build();
+
+        ErrorPayload errorPayload = ErrorPayload.builder()
+                .errors(List.of(errorDetail))
+                .build();
+
+        BasicResponse<?> response = BasicResponse.error(
+                ex.getHttpStatus(),
+                ex.getMessage(),
+                errorPayload
+        );
+
+        return ResponseEntity.status(ex.getHttpStatus()).body(response);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<BasicResponse<?>> handleRuntimeException(RuntimeException ex) {
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .code("INTERNAL_SERVER_ERROR")
+                .message("예상치 못한 서버 오류가 발생했습니다.")
+                .build();
+
+        ErrorPayload errorPayload = ErrorPayload.builder()
+                .errors(List.of(errorDetail))
+                .build();
+
+        BasicResponse<?> response = BasicResponse.error(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "서버 내부 오류",
+                errorPayload
+        );
+
+        return ResponseEntity.internalServerError().body(response);
+    }
 }
