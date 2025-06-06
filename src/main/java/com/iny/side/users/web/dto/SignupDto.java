@@ -27,4 +27,13 @@ public record SignupDto(
                 account.getRole()
         );
     }
+
+    public Account toAccount(String cryptedPassword) {
+        return Account.builder()
+                .username(this.username())
+                .password(cryptedPassword)
+                .name(this.name())
+                .role(this.role())
+                .build();
+    }
 }

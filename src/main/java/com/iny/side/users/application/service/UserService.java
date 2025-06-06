@@ -4,7 +4,7 @@ import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.web.dto.SignupDto;
 
 public interface UserService {
-    Account createUser(SignupDto signupDto);
+    Account signup(SignupDto signupDto);
 
     boolean existsByUsername(String username);
 }

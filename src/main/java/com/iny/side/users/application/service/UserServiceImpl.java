@@ -18,11 +18,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Account createUser(SignupDto signupDto) {
+    public Account signup(SignupDto signupDto) {
         if (existsByUsername(signupDto.username())) {
             throw new DuplicateUsernameException(signupDto.username());
         }
-        return userRepository.save(Account.from(signupDto, passwordEncoder.encode(signupDto.password())));
+
+        return userRepository.save(signupDto.toAccount(passwordEncoder.encode(signupDto.password())));
     }
 
     @Override

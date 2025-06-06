@@ -35,7 +35,7 @@ public class RestApiController {
 
     @PostMapping("/signup")
     public SignupDto signup(@RequestBody @Valid SignupDto signupDto) {
-        return SignupDto.from(userService.createUser(signupDto));
+        return SignupDto.from(userService.signup(signupDto));
     }
 
     @GetMapping("/signup/check-username")
