@@ -3,13 +3,12 @@ package com.iny.side.assignment.application.service;
 import com.iny.side.account.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
-import com.iny.side.assignment.web.dto.AssignmentDto;
+import com.iny.side.assignment.web.dto.AssignmentResponseDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -95,15 +94,15 @@ class AssignmentServiceTest {
     void 내_강의에_과제가_여러개_있으면_모두_정상_조회() {
         // given
         // when
-        List<AssignmentDto> assignments = assignmentService.findAssignmentsByCourseAndProfessor(testCourse1.getId(), professorAccount1.getId());
+        List<AssignmentResponseDto> assignments = assignmentService.findAssignmentsByCourseAndProfessor(testCourse1.getId(), professorAccount1.getId());
 
         // then
         assertThat(assignments)
                 .hasSize(2)
                 .extracting(
-                        AssignmentDto::title,
-                        AssignmentDto::dueDate,
-                        AssignmentDto::creatorName
+                        AssignmentResponseDto::title,
+                        AssignmentResponseDto::dueDate,
+                        AssignmentResponseDto::creatorName
                 )
                 .containsExactlyInAnyOrder(
                         tuple("첫번째과제", LocalDateTime.of(2025, 6, 30, 23, 0), "이교수"),

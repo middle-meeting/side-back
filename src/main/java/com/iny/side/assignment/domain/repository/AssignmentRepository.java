@@ -7,4 +7,6 @@ import java.util.List;
 public interface AssignmentRepository {
 
     List<Assignment> findByCourseId(Long courseId);
+
+    Assignment save(Assignment assignment);
 }

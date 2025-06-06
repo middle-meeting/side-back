@@ -4,9 +4,9 @@ import com.iny.side.assignment.domain.entity.Assignment;
 
 import java.time.LocalDateTime;
 
-public record AssignmentDto(Long id, String title, LocalDateTime dueDate, String creatorName) {
-    public static AssignmentDto from(Assignment assignment) {
-        return new AssignmentDto(
+public record AssignmentResponseDto(Long id, String title, LocalDateTime dueDate, String creatorName) {
+    public static AssignmentResponseDto from(Assignment assignment) {
+        return new AssignmentResponseDto(
                 assignment.getId(),
                 assignment.getTitle(),
                 assignment.getDueDate(),

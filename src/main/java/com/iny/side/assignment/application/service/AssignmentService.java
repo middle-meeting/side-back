@@ -1,9 +1,12 @@
 package com.iny.side.assignment.application.service;
 
-import com.iny.side.assignment.web.dto.AssignmentDto;
+import com.iny.side.assignment.web.dto.AssignmentCreateDto;
+import com.iny.side.assignment.web.dto.AssignmentResponseDto;
 
 import java.util.List;
 
 public interface AssignmentService {
-    List<AssignmentDto> findAssignmentsByCourseAndProfessor(Long courseId, Long accountId);
+    List<AssignmentResponseDto> findAssignmentsByCourseAndProfessor(Long courseId, Long accountId);
+
+    AssignmentResponseDto create(Long courseId, Long id, AssignmentCreateDto assignmentCreateDto);
 }

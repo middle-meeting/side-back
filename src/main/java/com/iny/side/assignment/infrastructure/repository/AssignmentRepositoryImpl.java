@@ -18,4 +18,9 @@ public class AssignmentRepositoryImpl implements AssignmentRepository {
     public List<Assignment> findByCourseId(Long courseId) {
         return assignmentJpaRepository.findByCourseId(courseId);
     }
+
+    @Override
+    public Assignment save(Assignment assignment) {
+        return assignmentJpaRepository.save(assignment);
+    }
 }
