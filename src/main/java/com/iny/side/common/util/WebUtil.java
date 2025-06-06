@@ -15,6 +15,7 @@ public class WebUtil {
     }
 
     public static boolean isContentTypeJson(HttpServletRequest request) {
-        return request.getHeader(CONTENT_TYPE).contains(CONTENT_TYPE_JSON);
+        String header = request.getHeader(CONTENT_TYPE);
+        return header != null && header.contains(CONTENT_TYPE_JSON);
     }
 }

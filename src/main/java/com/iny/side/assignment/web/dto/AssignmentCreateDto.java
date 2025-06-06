@@ -12,21 +12,9 @@ public record AssignmentCreateDto(String title, String personaName, int personaA
                                   String personaDisease, String objective, int maxTurns,
                                   @Future(message = "마감일이 올바르지 않습니다.")
                                   LocalDateTime dueDate) {
-    public Assignment to(Course course) {
-        return Assignment.builder()
-                .title(title)
-                .personaName(personaName)
-                .personaAge(personaAge)
-                .personaGender(personaGender)
-                .personaSymptom(personaSymptom)
-                .personaHistory(personaHistory)
-                .personaPersonality(personaPersonality)
-                .personaDisease(personaDisease)
-                .objective(objective)
-                .maxTurns(maxTurns)
-                .dueDate(dueDate)
-                .account(course.getAccount())
-                .course(course)
-                .build();
-    }
+    /*
+     * DTO에서 엔티티 생성을 담당하던 메서드는 Assignment.create()를 사용하도록
+     * 리팩터링되면서 더 이상 사용되지 않는다. 도메인 로직 중복을 방지하기 위해
+     * 해당 메서드는 제거한다.
+     */
 }
