@@ -1,27 +1,32 @@
 package com.iny.side.common;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-
 @Getter
-@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class BasicResponse<T> {
-    @Builder.Default
-    private HttpStatus status = HttpStatus.OK;
-    @Builder.Default
-    private Integer code = HttpStatus.OK.value();
-    private String message;
-    private Integer count;
-    private List<T> data;
+    private final HttpStatus status;
+    private final Integer code;
+    private final String message;
+    private final T data;
+    private final ErrorPayload error;
 
-    public static <T> BasicResponse<T> ok(List<T> data) {
-        return BasicResponse.<T>builder()
-                .message("성공")
-                .count(data.size())
-                .data(data)
-                .build();
+    public static <T> BasicResponse<T> ok(T data) {
+        return ok(data, "성공");
+    }
+
+    public static <T> BasicResponse<T> ok(T data, String message) {
+        return new BasicResponse<>(HttpStatus.OK, HttpStatus.OK.value(), message, data, null);
+    }
+
+    public static <T> BasicResponse<T> error(HttpStatus status, ErrorPayload error) {
+        return error(status, "오류가 발생했습니다.", error);
+    }
+
+    public static <T> BasicResponse<T> error(HttpStatus status, String message, ErrorPayload error) {
+        return new BasicResponse<>(status, status.value(), message, null, error);
     }
 }

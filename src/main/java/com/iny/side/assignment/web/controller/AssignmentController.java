@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -19,8 +21,8 @@ public class AssignmentController {
 
     private final AssignmentService assignmentService;
 
-    @GetMapping(value = "/professor/courses/{courseId}/assignments}")
-    public ResponseEntity<BasicResponse<AssignmentDto>> getAssignments(
+    @GetMapping(value = "/professor/courses/{courseId}/assignments")
+    public ResponseEntity<BasicResponse<List<AssignmentDto>>> getAssignments(
             @AuthenticationPrincipal AccountResponseDto accountResponseDto,
             @PathVariable Long courseId) {
         return ResponseEntity.ok(BasicResponse.ok(assignmentService.findAssignmentsByCourseAndProfessor(courseId, accountResponseDto.id())));
