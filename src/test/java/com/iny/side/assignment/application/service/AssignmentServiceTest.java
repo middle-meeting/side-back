@@ -144,7 +144,7 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void 과제_생성_권한없음() {
+    void 교수는_타교수강의에는_과제_생성_불가() {
         AssignmentCreateDto createDto = new AssignmentCreateDto(
                 "심부전 케이스",
                 "최환자",
@@ -165,7 +165,7 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void 과제_생성_강의없음() {
+    void 존재하지_않는_강의에는_과제생성_불가() {
         AssignmentCreateDto createDto = new AssignmentCreateDto(
                 "심부전 케이스",
                 "최환자",
