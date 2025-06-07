@@ -165,7 +165,7 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void 존재하지_않는_강의에는_과제생성_불가() {
+    void 존재하지_않는_강의에는_과제_생성_불가() {
         AssignmentCreateDto createDto = new AssignmentCreateDto(
                 "심부전 케이스",
                 "최환자",
