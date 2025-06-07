@@ -3,7 +3,10 @@ package com.iny.side.assignment.application.service;
 import com.iny.side.account.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
+import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentResponseDto;
+import com.iny.side.common.exception.ForbiddenException;
+import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.mock.FakeCourseRepository;
@@ -24,12 +27,12 @@ class AssignmentServiceTest {
     private FakeCourseRepository fakeCourseRepository;
     private FakeUserRepository fakeUserRepository;
 
-    private Account professorAccount1;
-    private Course testCourse1;
+    private Account professor;
+    private Account otherProfessor;
+    private Course testCourse;
 
     @BeforeEach
     void setUp() {
-
         fakeAssignmentRepository = new FakeAssignmentRepository();
         fakeCourseRepository = new FakeCourseRepository();
         fakeUserRepository = new FakeUserRepository();
@@ -39,74 +42,146 @@ class AssignmentServiceTest {
                 .courseRepository(fakeCourseRepository)
                 .build();
 
-        professorAccount1 = Account.builder()
-                .username("test1@test.com")
-                .password("123123123")
-                .name("이교수")
+        // 교수 1, 2 생성
+        professor = Account.builder()
+                .username("prof1@test.com")
+                .password("pw1")
+                .name("교수1")
                 .role(Role.PROFESSOR)
                 .build();
-        professorAccount1 = fakeUserRepository.save(professorAccount1);
+        professor = fakeUserRepository.save(professor);
 
-        testCourse1 = Course.builder()
-                .name("이교수의 케이스스터디")
-                .semester("202501")
-                .account(professorAccount1)
+        otherProfessor = Account.builder()
+                .username("prof2@test.com")
+                .password("pw2")
+                .name("교수2")
+                .role(Role.PROFESSOR)
                 .build();
-        testCourse1 = fakeCourseRepository.save(testCourse1);
+        otherProfessor = fakeUserRepository.save(otherProfessor);
 
-        Assignment testAssignment1 = Assignment.builder()
-                .title("첫번째과제")
+        // testCourse 생성 (교수1 소유)
+        testCourse = Course.builder()
+                .name("과제강의")
+                .semester("2025-01")
+                .account(professor)
+                .build();
+        testCourse = fakeCourseRepository.save(testCourse);
+
+        // 과제 2개 생성 (testCourse 소속)
+        Assignment assignment1 = Assignment.builder()
+                .title("심장질환 케이스")
                 .personaName("김환자")
-                .personaAge(18)
-                .personaGender(GenderType.MALE)
-                .personaSymptom("가슴 통증")
-                .personaHistory("과거 심장질환 병력 있음")
+                .personaAge(22)
+                .personaGender(GenderType.FEMALE)
+                .personaSymptom("흉통")
+                .personaHistory("고혈압")
                 .personaPersonality("침착함")
-                .personaDisease("고혈압")
-                .objective("심장 질환 감별 및 대처법 교육")
+                .personaDisease("심근경색")
+                .objective("심근경색 조기 진단 교육")
                 .maxTurns(10)
-                .dueDate(LocalDateTime.of(2025, 6, 30, 23, 0))
-                .account(professorAccount1)
-                .course(testCourse1)
+                .dueDate(LocalDateTime.of(2025, 7, 10, 14, 0))
+                .account(professor)
+                .course(testCourse)
                 .build();
 
-        Assignment testAssignment2 = Assignment.builder()
-                .title("두번째과제")
+        Assignment assignment2 = Assignment.builder()
+                .title("소화기 질환")
                 .personaName("박환자")
                 .personaAge(35)
-                .personaGender(GenderType.FEMALE)
-                .personaSymptom("복부 통증과 메스꺼움")
-                .personaHistory("과거 위염 진단 경험")
+                .personaGender(GenderType.MALE)
+                .personaSymptom("복부통증")
+                .personaHistory("과거 위염")
                 .personaPersonality("걱정이 많음")
                 .personaDisease("위염")
-                .objective("소화기 질환 초기진단 및 생활습관 개선 교육")
-                .maxTurns(20)
-                .dueDate(LocalDateTime.of(2025, 6, 29, 18, 0))
-                .account(professorAccount1)
-                .course(testCourse1)
+                .objective("생활습관 개선 교육")
+                .maxTurns(5)
+                .dueDate(LocalDateTime.of(2025, 7, 12, 18, 0))
+                .account(professor)
+                .course(testCourse)
                 .build();
 
-        fakeAssignmentRepository.save(testAssignment1);
-        fakeAssignmentRepository.save(testAssignment2);
+        fakeAssignmentRepository.save(assignment1);
+        fakeAssignmentRepository.save(assignment2);
     }
 
     @Test
-    void 내_강의에_과제가_여러개_있으면_모두_정상_조회() {
-        // given
+    void 교수는_본인_강의의_과제_여러개_정상조회() {
         // when
-        List<AssignmentResponseDto> assignments = assignmentService.findAssignmentsByCourseAndProfessor(testCourse1.getId(), professorAccount1.getId());
+        List<AssignmentResponseDto> result = assignmentService.findAssignmentsByCourseAndProfessor(testCourse.getId(), professor.getId());
 
         // then
-        assertThat(assignments)
+        assertThat(result)
                 .hasSize(2)
-                .extracting(
-                        AssignmentResponseDto::title,
-                        AssignmentResponseDto::dueDate,
-                        AssignmentResponseDto::creatorName
-                )
-                .containsExactlyInAnyOrder(
-                        tuple("첫번째과제", LocalDateTime.of(2025, 6, 30, 23, 0), "이교수"),
-                        tuple("두번째과제", LocalDateTime.of(2025, 6, 29, 18, 0), "이교수")
-                );
+                .extracting(AssignmentResponseDto::title)
+                .containsExactlyInAnyOrder("심장질환 케이스", "소화기 질환");
+    }
+
+    @Test
+    void 과제_생성_정상() {
+        // given
+        AssignmentCreateDto createDto = new AssignmentCreateDto(
+                "심부전 케이스",
+                "최환자",
+                65,
+                GenderType.FEMALE,
+                "호흡곤란",
+                "고혈압",
+                "내성적",
+                "심부전",
+                "심부전 진단 교육",
+                12,
+                LocalDateTime.of(2025, 7, 15, 18, 0)
+        );
+
+        // when
+        AssignmentResponseDto result = assignmentService.create(testCourse.getId(), professor.getId(), createDto);
+
+        // then
+        assertThat(result.title()).isEqualTo("심부전 케이스");
+        assertThat(fakeAssignmentRepository.findByCourseId(testCourse.getId()))
+                .extracting(Assignment::getTitle)
+                .contains("심부전 케이스");
+    }
+
+    @Test
+    void 과제_생성_권한없음() {
+        AssignmentCreateDto createDto = new AssignmentCreateDto(
+                "심부전 케이스",
+                "최환자",
+                65,
+                GenderType.FEMALE,
+                "호흡곤란",
+                "고혈압",
+                "내성적",
+                "심부전",
+                "심부전 진단 교육",
+                12,
+                LocalDateTime.of(2025, 7, 15, 18, 0)
+        );
+        assertThatThrownBy(() ->
+                assignmentService.create(testCourse.getId(), otherProfessor.getId(), createDto)
+        ).isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("본인의 강의가 아닙니다");
+    }
+
+    @Test
+    void 과제_생성_강의없음() {
+        AssignmentCreateDto createDto = new AssignmentCreateDto(
+                "심부전 케이스",
+                "최환자",
+                65,
+                GenderType.FEMALE,
+                "호흡곤란",
+                "고혈압",
+                "내성적",
+                "심부전",
+                "심부전 진단 교육",
+                12,
+                LocalDateTime.of(2025, 7, 15, 18, 0)
+        );
+        assertThatThrownBy(() ->
+                assignmentService.create(99999L, professor.getId(), createDto)
+        ).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Course", 99999);
     }
 }
