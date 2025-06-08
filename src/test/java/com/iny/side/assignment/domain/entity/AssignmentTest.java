@@ -32,7 +32,7 @@ class AssignmentTest {
         assertThat(assignment.getTitle()).isEqualTo("테스트 과제");
         assertThat(assignment.getDueDate().getMinute()).isEqualTo(0);
         assertThat(assignment.getCourse()).isEqualTo(course);
-        assertThat(assignment.getAccount()).isEqualTo(professor);
+        assertThat(assignment.getCourse().getAccount()).isEqualTo(professor);
     }
 
     @Test

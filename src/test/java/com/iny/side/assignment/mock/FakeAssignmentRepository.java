@@ -6,6 +6,7 @@ import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FakeAssignmentRepository implements AssignmentRepository {
@@ -28,7 +29,6 @@ public class FakeAssignmentRepository implements AssignmentRepository {
                     .objective(assignment.getObjective())
                     .maxTurns(assignment.getMaxTurns())
                     .dueDate(assignment.getDueDate())
-                    .account(assignment.getAccount())
                     .course(assignment.getCourse())
                     .build();
 
@@ -41,7 +41,14 @@ public class FakeAssignmentRepository implements AssignmentRepository {
     }
 
     @Override
-    public List<Assignment> findByCourseId(Long courseId) {
+    public Optional<Assignment> findByAssignmentId(Long assignmentId) {
+        return data.stream()
+                .filter(item -> Objects.equals(item.getId(), assignmentId))
+                .findFirst();
+    }
+
+    @Override
+    public List<Assignment> findAllByCourseId(Long courseId) {
         return data.stream()
                 .filter(assignment -> assignment.getCourse() != null &&
                         Objects.equals(assignment.getCourse().getId(), courseId))

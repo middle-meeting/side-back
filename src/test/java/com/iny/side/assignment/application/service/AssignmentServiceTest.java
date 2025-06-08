@@ -4,7 +4,8 @@ import com.iny.side.account.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
-import com.iny.side.assignment.web.dto.AssignmentResponseDto;
+import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
+import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.common.domain.GenderType;
@@ -30,6 +31,7 @@ class AssignmentServiceTest {
     private Account professor;
     private Account otherProfessor;
     private Course testCourse;
+    private Assignment testAssignment;
 
     @BeforeEach
     void setUp() {
@@ -80,7 +82,6 @@ class AssignmentServiceTest {
                 .objective("심근경색 조기 진단 교육")
                 .maxTurns(10)
                 .dueDate(LocalDateTime.of(2025, 7, 10, 14, 0))
-                .account(professor)
                 .course(testCourse)
                 .build();
 
@@ -96,24 +97,39 @@ class AssignmentServiceTest {
                 .objective("생활습관 개선 교육")
                 .maxTurns(5)
                 .dueDate(LocalDateTime.of(2025, 7, 12, 18, 0))
-                .account(professor)
+                .course(testCourse)
+                .build();
+
+        testAssignment = Assignment.builder()
+                .title("상세보기용 과제")
+                .personaName("김환자")
+                .personaAge(28)
+                .personaGender(GenderType.FEMALE)
+                .personaSymptom("두통")
+                .personaHistory("특이사항 없음")
+                .personaPersonality("내성적")
+                .personaDisease("긴장성 두통")
+                .objective("두통 감별법 학습")
+                .maxTurns(8)
+                .dueDate(LocalDateTime.of(2025, 7, 25, 15, 0))
                 .course(testCourse)
                 .build();
 
         fakeAssignmentRepository.save(assignment1);
         fakeAssignmentRepository.save(assignment2);
+        testAssignment = fakeAssignmentRepository.save(testAssignment);
     }
 
     @Test
     void 교수는_본인_강의의_과제_여러개_정상조회() {
         // when
-        List<AssignmentResponseDto> result = assignmentService.findAssignmentsByCourseAndProfessor(testCourse.getId(), professor.getId());
+        List<AssignmentSimpleResponseDto> result = assignmentService.findAssignmentsByCourseAndProfessor(testCourse.getId(), professor.getId());
 
         // then
         assertThat(result)
-                .hasSize(2)
-                .extracting(AssignmentResponseDto::title)
-                .containsExactlyInAnyOrder("심장질환 케이스", "소화기 질환");
+                .hasSize(3)
+                .extracting(AssignmentSimpleResponseDto::title)
+                .containsExactlyInAnyOrder("심장질환 케이스", "소화기 질환", "상세보기용 과제");
     }
 
     @Test
@@ -134,11 +150,11 @@ class AssignmentServiceTest {
         );
 
         // when
-        AssignmentResponseDto result = assignmentService.create(testCourse.getId(), professor.getId(), createDto);
+        AssignmentSimpleResponseDto result = assignmentService.create(testCourse.getId(), professor.getId(), createDto);
 
         // then
         assertThat(result.title()).isEqualTo("심부전 케이스");
-        assertThat(fakeAssignmentRepository.findByCourseId(testCourse.getId()))
+        assertThat(fakeAssignmentRepository.findAllByCourseId(testCourse.getId()))
                 .extracting(Assignment::getTitle)
                 .contains("심부전 케이스");
     }
@@ -183,5 +199,44 @@ class AssignmentServiceTest {
                 assignmentService.create(99999L, professor.getId(), createDto)
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Course", 99999);
+    }
+
+    @Test
+    void 교수_본인_강의의_과제_상세보기_정상_조회() {
+        // given
+        // when
+        AssignmentDetailResponseDto detail = assignmentService.findAssignmentByCourseAndProfessor(
+                testCourse.getId(), professor.getId(), testAssignment.getId());
+
+        // then
+        assertThat(detail).isNotNull();
+        assertThat(detail.title()).isEqualTo("상세보기용 과제");
+        assertThat(detail.personaName()).isEqualTo("김환자");
+        assertThat(detail.dueDate()).isEqualTo(LocalDateTime.of(2025, 7, 25, 15, 0));
+    }
+
+    @Test
+    void 교수는_타교수_강의의_과제_상세보기_불가() {
+        // when & then
+        assertThatThrownBy(() ->
+                assignmentService.findAssignmentByCourseAndProfessor(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
+        ).isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("본인의 강의가 아닙니다");
+    }
+
+    @Test
+    void 존재하지_않는_강의에는_상세보기_불가() {
+        assertThatThrownBy(() ->
+                assignmentService.findAssignmentByCourseAndProfessor(99999L, professor.getId(), testAssignment.getId())
+        ).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Course");
+    }
+
+    @Test
+    void 존재하지_않는_과제는_상세보기_불가() {
+        assertThatThrownBy(() ->
+                assignmentService.findAssignmentByCourseAndProfessor(testCourse.getId(), professor.getId(), 88888L)
+        ).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Assignment");
     }
 }
