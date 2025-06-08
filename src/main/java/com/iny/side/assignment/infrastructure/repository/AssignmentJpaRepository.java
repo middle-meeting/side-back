@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface AssignmentJpaRepository extends JpaRepository<Assignment, Long> {
 
-    List<Assignment> findByCourseId(Long courseId);
+    List<Assignment> findAllByCourseId(Long courseId);
 }

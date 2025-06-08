@@ -57,15 +57,11 @@ public class Assignment {
     private LocalDateTime dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id")
-    private Account account;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
 
     @Builder
-    public Assignment(Long id, String title, String personaName, Integer personaAge, GenderType personaGender, String personaSymptom, String personaHistory, String personaPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Account account, Course course) {
+    public Assignment(Long id, String title, String personaName, Integer personaAge, GenderType personaGender, String personaSymptom, String personaHistory, String personaPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Course course) {
         this.id = id;
         this.title = title;
         this.personaName = personaName;
@@ -78,7 +74,6 @@ public class Assignment {
         this.objective = objective;
         this.maxTurns = maxTurns;
         this.dueDate = dueDate;
-        this.account = account;
         this.course = course;
     }
 
@@ -99,7 +94,6 @@ public class Assignment {
                 .objective(dto.objective())
                 .maxTurns(dto.maxTurns())
                 .dueDate(dto.dueDate())
-                .account(course.getAccount())
                 .course(course)
                 .build();
     }
