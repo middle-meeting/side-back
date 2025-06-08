@@ -38,13 +38,4 @@ public class Account {
         this.name = name;
         this.role = role;
     }
-
-    public static Account from(SignupDto signupDto, String cryptedPassword) {
-        return Account.builder()
-                .password(cryptedPassword)
-                .username(signupDto.username())
-                .name(signupDto.name())
-                .role(signupDto.role())
-                .build();
-    }
 }

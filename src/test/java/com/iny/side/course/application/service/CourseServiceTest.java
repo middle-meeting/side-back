@@ -3,11 +3,10 @@ package com.iny.side.course.application.service;
 import com.iny.side.account.mock.FakeUserRepository;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.mock.FakeCourseRepository;
-import com.iny.side.course.web.dto.MyCoursesDto;
+import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.web.dto.AccountResponseDto;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -96,7 +95,7 @@ class CourseServiceTest {
         String semester = "202501";
 
         // when
-        List<MyCoursesDto> result = courseService.findMyCourse(dto, semester);
+        List<ProfessorCoursesDto> result = courseService.findProfessorCourses(dto, semester);
 
         // then
         // 1. 조회된 과목 수
@@ -109,7 +108,7 @@ class CourseServiceTest {
                 .allMatch(course -> course.semester().equals(semester));
         // 4. 과목명이 기대값에 포함되는지
         assertThat(result)
-                .extracting(MyCoursesDto::name)
+                .extracting(ProfessorCoursesDto::name)
                 .containsExactlyInAnyOrder("한의학 입문", "인체학 입문");
     }
 }

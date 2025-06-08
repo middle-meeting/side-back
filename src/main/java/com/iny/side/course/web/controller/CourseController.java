@@ -3,7 +3,7 @@ package com.iny.side.course.web.controller;
 
 import com.iny.side.common.BasicResponse;
 import com.iny.side.course.application.service.CourseService;
-import com.iny.side.course.web.dto.MyCoursesDto;
+import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +23,9 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping(value = "/professor/courses")
-    public ResponseEntity<BasicResponse<List<MyCoursesDto>>> myCourse(
+    public ResponseEntity<BasicResponse<List<ProfessorCoursesDto>>> getProfessorCourses(
             @AuthenticationPrincipal AccountResponseDto accountResponseDto,
             @RequestParam(value = "semester") String semester) {
-        return ResponseEntity.ok(BasicResponse.ok(courseService.findMyCourse(accountResponseDto, semester)));
+        return ResponseEntity.ok(BasicResponse.ok(courseService.findProfessorCourses(accountResponseDto, semester)));
     }
 }
