@@ -12,4 +12,6 @@ public interface AssignmentRepository {
     Assignment save(Assignment assignment);
 
     Optional<Assignment> findByAssignmentId(Long assignmentId);
+
+    void delete(Assignment assignment);
 }

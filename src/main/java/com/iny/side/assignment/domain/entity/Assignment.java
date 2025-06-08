@@ -4,7 +4,6 @@ import com.iny.side.assignment.exception.InvalidAssignmentDueDateException;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
-import com.iny.side.users.domain.entity.Account;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,6 +32,7 @@ public class Assignment {
     private Integer personaAge;
 
     @Column(name = "persona_gender", nullable = false)
+    @Enumerated(EnumType.STRING)
     private GenderType personaGender;
 
     @Column(name = "persona_symptom", nullable = false)

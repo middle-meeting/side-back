@@ -5,6 +5,7 @@ import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.repository.CourseRepository;
@@ -42,9 +43,27 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     public AssignmentDetailResponseDto findAssignmentByCourseAndProfessor(Long courseId, Long professorId, Long assignmentId) {
         validateProfessorOwnsCourse(courseId, professorId);
-        Assignment findAssignment = assignmentRepository.findByAssignmentId(assignmentId)
+        Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment", assignmentId));
-        return AssignmentDetailResponseDto.from(findAssignment);
+        validateAssignmentBelongsToCourse(courseId, assignment);
+        return AssignmentDetailResponseDto.from(assignment);
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteAssignmentByCourseAndProfessor(Long courseId, Long professorId, Long assignmentId) {
+        validateProfessorOwnsCourse(courseId, professorId);
+        Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
+                .orElseThrow(() -> new NotFoundException("Assignment", assignmentId));
+        validateAssignmentBelongsToCourse(courseId, assignment);
+        assignmentRepository.delete(assignment);
+    }
+
+    private static void validateAssignmentBelongsToCourse(Long courseId, Assignment assignment) {
+        if (!assignment.getCourse().getId().equals(courseId)) {
+            throw new ForbiddenException("해당 강의의 과제가 아닙니다.");
+        }
     }
 
     private Course validateProfessorOwnsCourse(Long courseId, Long professorId) {

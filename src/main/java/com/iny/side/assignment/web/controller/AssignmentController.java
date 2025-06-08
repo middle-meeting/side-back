@@ -39,7 +39,18 @@ public class AssignmentController {
     @GetMapping(value = "/professor/courses/{courseId}/assignments/{assignmentId}")
     public ResponseEntity<BasicResponse<AssignmentDetailResponseDto>> get(
             @AuthenticationPrincipal AccountResponseDto accountResponseDto,
-            @PathVariable Long courseId, @PathVariable Long assignmentId) {
+            @PathVariable Long courseId,
+            @PathVariable Long assignmentId) {
         return ResponseEntity.ok(BasicResponse.ok(assignmentService.findAssignmentByCourseAndProfessor(courseId, accountResponseDto.id(), assignmentId)));
     }
+
+    @DeleteMapping(value = "/professor/courses/{courseId}/assignments/{assignmentId}")
+    public ResponseEntity<BasicResponse<Void>> delete(
+            @AuthenticationPrincipal AccountResponseDto accountResponseDto,
+            @PathVariable Long courseId,
+            @PathVariable Long assignmentId) {
+        assignmentService.deleteAssignmentByCourseAndProfessor(courseId, accountResponseDto.id(), assignmentId);
+        return ResponseEntity.ok(BasicResponse.ok());
+    }
+
 }

@@ -28,4 +28,9 @@ public class AssignmentRepositoryImpl implements AssignmentRepository {
     public Optional<Assignment> findByAssignmentId(Long assignmentId) {
         return assignmentJpaRepository.findById(assignmentId);
     }
+
+    @Override
+    public void delete(Assignment assignment) {
+        assignmentJpaRepository.delete(assignment);
+    }
 }

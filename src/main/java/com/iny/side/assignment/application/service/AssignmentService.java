@@ -12,4 +12,6 @@ public interface AssignmentService {
     AssignmentSimpleResponseDto create(Long courseId, Long id, AssignmentCreateDto assignmentCreateDto);
 
     AssignmentDetailResponseDto findAssignmentByCourseAndProfessor(Long courseId, Long accountId, Long assignmentId);
+
+    void deleteAssignmentByCourseAndProfessor(Long courseId, Long accountId, Long assignmentId);
 }
