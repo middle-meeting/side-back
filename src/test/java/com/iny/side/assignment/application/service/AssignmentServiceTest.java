@@ -6,9 +6,9 @@ import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
-import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.users.domain.Role;
@@ -19,7 +19,8 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AssignmentServiceTest {
 
@@ -202,7 +203,7 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void 교수_본인_강의의_과제_상세보기_정상_조회() {
+    void 교수_본인_강의의_과제_상세조회_정상_조회() {
         // given
         // when
         AssignmentDetailResponseDto detail = assignmentService.findAssignmentByCourseAndProfessor(
@@ -216,7 +217,7 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void 교수는_타교수_강의의_과제_상세보기_불가() {
+    void 교수는_타교수_강의의_과제_상세조회_불가() {
         // when & then
         assertThatThrownBy(() ->
                 assignmentService.findAssignmentByCourseAndProfessor(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
@@ -225,7 +226,7 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void 존재하지_않는_강의에는_상세보기_불가() {
+    void 존재하지_않는_강의에는_상세조회_불가() {
         assertThatThrownBy(() ->
                 assignmentService.findAssignmentByCourseAndProfessor(99999L, professor.getId(), testAssignment.getId())
         ).isInstanceOf(NotFoundException.class)
@@ -233,10 +234,73 @@ class AssignmentServiceTest {
     }
 
     @Test
-    void 존재하지_않는_과제는_상세보기_불가() {
+    void 존재하지_않는_과제는_상세조회_불가() {
         assertThatThrownBy(() ->
                 assignmentService.findAssignmentByCourseAndProfessor(testCourse.getId(), professor.getId(), 88888L)
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Assignment");
+    }
+
+    @Test
+    void 강의에_속하지_않는_과제는_상세조회_불가() {
+        Course otherCourse = Course.builder()
+                .name("다른 강의")
+                .semester("2025-01")
+                .account(professor)
+                .build();
+        Course savedCourse = fakeCourseRepository.save(otherCourse);
+
+        assertThatThrownBy(() ->
+                assignmentService.findAssignmentByCourseAndProfessor(savedCourse.getId(), professor.getId(), testAssignment.getId())
+        ).isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("해당 강의의 과제가 아닙니다");
+    }
+
+    @Test
+    void 과제_삭제_정상() {
+        // given
+        // when
+        assignmentService.deleteAssignmentByCourseAndProfessor(testCourse.getId(), professor.getId(), testAssignment.getId());
+        // then
+        assertThat(fakeAssignmentRepository.findByAssignmentId(testAssignment.getId())).isEmpty();
+    }
+
+    @Test
+    void 존재하지_않는_강의는_삭제_불가() {
+        assertThatThrownBy(() ->
+                assignmentService.deleteAssignmentByCourseAndProfessor(99999L, professor.getId(), testAssignment.getId())
+        ).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Course");
+    }
+
+    @Test
+    void 존재하지_않는_과제는_삭제_불가() {
+        assertThatThrownBy(() ->
+                assignmentService.deleteAssignmentByCourseAndProfessor(testCourse.getId(), professor.getId(), 88888L)
+        ).isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Assignment");
+    }
+
+    @Test
+    void 교수는_타교수_강의의_과제_삭제_불가() {
+        assertThatThrownBy(() ->
+                assignmentService.deleteAssignmentByCourseAndProfessor(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
+        ).isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("본인의 강의가 아닙니다");
+    }
+
+    @Test
+    void 강의에_속하지_않는_과제는_삭제_불가() {
+        Course otherCourse = Course.builder()
+                .name("다른 강의")
+                .semester("2025-01")
+                .account(professor)
+                .build();
+        Course savedCourse = fakeCourseRepository.save(otherCourse);
+
+        assertThatThrownBy(() ->
+                assignmentService.deleteAssignmentByCourseAndProfessor(savedCourse.getId(), professor.getId(), testAssignment.getId())
+        ).isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("해당 강의의 과제가 아닙니다");
     }
 }

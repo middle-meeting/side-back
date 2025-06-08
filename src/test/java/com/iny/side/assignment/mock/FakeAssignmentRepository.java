@@ -48,6 +48,11 @@ public class FakeAssignmentRepository implements AssignmentRepository {
     }
 
     @Override
+    public void delete(Assignment assignment) {
+        data.remove(assignment);
+    }
+
+    @Override
     public List<Assignment> findAllByCourseId(Long courseId) {
         return data.stream()
                 .filter(assignment -> assignment.getCourse() != null &&
