@@ -106,7 +106,7 @@ class CourseServiceTest {
     @Test
     void 교수는_해당학기에_본인이_가르치는_과목을_조회_가능() {
         // when
-        List<ProfessorCoursesDto> result = courseService.findProfessorCourses(professor.getId(), "2025-01");
+        List<ProfessorCoursesDto> result = courseService.getAll(professor.getId(), "2025-01");
 
         // then
         // 1. 조회된 과목 수
@@ -126,7 +126,7 @@ class CourseServiceTest {
     @Test
     void 학생은_해당학기에_본인이_수강하는_과목_조회_가능() {
         // when
-        List<EnrolledCoursesDto> result = courseService.findEnrolledCourses(student.getId(), "2025-01");
+        List<EnrolledCoursesDto> result = courseService.getAllEnrolled(student.getId(), "2025-01");
 
         // then
         assertThat(result).hasSize(1);

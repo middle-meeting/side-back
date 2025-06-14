@@ -1,5 +1,6 @@
 package com.iny.side.assignment.domain.entity;
 
+import com.iny.side.assignment.domain.vo.AssignmentInfo;
 import com.iny.side.assignment.exception.InvalidAssignmentDueDateException;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.common.domain.GenderType;
@@ -77,23 +78,23 @@ public class Assignment {
         this.course = course;
     }
 
-    public static Assignment create(Course course, AssignmentCreateDto dto) {
-        if (dto.dueDate().getMinute() % 30 != 0 || dto.dueDate().getSecond() != 0 || dto.dueDate().getNano() != 0) {
+    public static Assignment create(Course course, AssignmentInfo info) {
+        if (info.dueDate().getMinute() % 30 != 0 || info.dueDate().getSecond() != 0 || info.dueDate().getNano() != 0) {
             throw new InvalidAssignmentDueDateException();
         }
 
         return Assignment.builder()
-                .title(dto.title())
-                .personaName(dto.personaName())
-                .personaAge(dto.personaAge())
-                .personaGender(dto.personaGender())
-                .personaSymptom(dto.personaSymptom())
-                .personaHistory(dto.personaHistory())
-                .personaPersonality(dto.personaPersonality())
-                .personaDisease(dto.personaDisease())
-                .objective(dto.objective())
-                .maxTurns(dto.maxTurns())
-                .dueDate(dto.dueDate())
+                .title(info.title())
+                .personaName(info.personaName())
+                .personaAge(info.personaAge())
+                .personaGender(info.personaGender())
+                .personaSymptom(info.personaSymptom())
+                .personaHistory(info.personaHistory())
+                .personaPersonality(info.personaPersonality())
+                .personaDisease(info.personaDisease())
+                .objective(info.objective())
+                .maxTurns(info.maxTurns())
+                .dueDate(info.dueDate())
                 .course(course)
                 .build();
     }

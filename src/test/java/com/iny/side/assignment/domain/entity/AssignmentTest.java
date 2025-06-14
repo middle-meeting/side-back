@@ -1,5 +1,6 @@
 package com.iny.side.assignment.domain.entity;
 
+import com.iny.side.assignment.domain.vo.AssignmentInfo;
 import com.iny.side.assignment.exception.InvalidAssignmentDueDateException;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.common.domain.GenderType;
@@ -26,7 +27,7 @@ class AssignmentTest {
         );
 
         // when
-        Assignment assignment = Assignment.create(course, dto);
+        Assignment assignment = Assignment.create(course, AssignmentInfo.from(dto));
 
         // then
         assertThat(assignment.getTitle()).isEqualTo("테스트 과제");
@@ -48,7 +49,7 @@ class AssignmentTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> Assignment.create(course, dto))
+        assertThatThrownBy(() -> Assignment.create(course, AssignmentInfo.from(dto)))
                 .isInstanceOf(InvalidAssignmentDueDateException.class)
                 .hasMessageContaining("마감일은 30분 단위로만 설정할 수 있습니다");
     }
@@ -66,7 +67,7 @@ class AssignmentTest {
         );
 
         // when & then
-        assertThatThrownBy(() -> Assignment.create(course, dto))
+        assertThatThrownBy(() -> Assignment.create(course, AssignmentInfo.from(dto)))
                 .isInstanceOf(InvalidAssignmentDueDateException.class);
     }
 }

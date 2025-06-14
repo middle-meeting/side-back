@@ -22,17 +22,15 @@ public class CourseServiceImpl implements CourseService {
     private final EnrollmentRepository enrollmentRepository;
 
     @Override
-    public List<ProfessorCoursesDto> findProfessorCourses(Long professorId, String semester) {
-        List<Course> courses = courseRepository.findAllByAccountIdAndSemester(professorId, semester);
-        return courses.stream()
+    public List<ProfessorCoursesDto> getAll(Long professorId, String semester) {
+        return courseRepository.findAllByAccountIdAndSemester(professorId, semester).stream()
                 .map(ProfessorCoursesDto::from)
                 .toList();
     }
 
     @Override
-    public List<EnrolledCoursesDto> findEnrolledCourses(Long studentId, String semester) {
-        List<Enrollment> enrollments =  enrollmentRepository.findAllByAccountIdAndSemester(studentId, semester);
-        return enrollments.stream()
+    public List<EnrolledCoursesDto> getAllEnrolled(Long studentId, String semester) {
+        return enrollmentRepository.findAllByAccountIdAndSemester(studentId, semester).stream()
                 .map(EnrolledCoursesDto::from)
                 .toList();
     }

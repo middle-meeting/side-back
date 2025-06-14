@@ -25,6 +25,6 @@ public class EnrolledCourseController {
     public ResponseEntity<BasicResponse<List<EnrolledCoursesDto>>> get(
             @AuthenticationPrincipal AccountResponseDto accountResponseDto,
             @RequestParam(value = "semester") String semester) {
-        return ResponseEntity.ok(BasicResponse.ok(courseService.findEnrolledCourses(accountResponseDto.id(), semester)));
+        return ResponseEntity.ok(BasicResponse.ok(courseService.getAllEnrolled(accountResponseDto.id(), semester)));
     }
 }

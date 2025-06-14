@@ -23,9 +23,9 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping(value = "/professor/courses")
-    public ResponseEntity<BasicResponse<List<ProfessorCoursesDto>>> get(
-            @AuthenticationPrincipal AccountResponseDto accountResponseDto,
+    public ResponseEntity<BasicResponse<List<ProfessorCoursesDto>>> getAll(
+            @AuthenticationPrincipal AccountResponseDto professor,
             @RequestParam(value = "semester") String semester) {
-        return ResponseEntity.ok(BasicResponse.ok(courseService.findProfessorCourses(accountResponseDto.id(), semester)));
+        return ResponseEntity.ok(BasicResponse.ok(courseService.getAll(professor.id(), semester)));
     }
 }

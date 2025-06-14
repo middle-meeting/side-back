@@ -7,11 +7,11 @@ import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import java.util.List;
 
 public interface AssignmentService {
-    List<AssignmentSimpleResponseDto> findAssignmentsByCourseAndProfessor(Long courseId, Long accountId);
+    List<AssignmentSimpleResponseDto> getAll(Long courseId, Long accountId);
 
     AssignmentSimpleResponseDto create(Long courseId, Long id, AssignmentCreateDto assignmentCreateDto);
 
-    AssignmentDetailResponseDto findAssignmentByCourseAndProfessor(Long courseId, Long accountId, Long assignmentId);
+    AssignmentDetailResponseDto get(Long courseId, Long accountId, Long assignmentId);
 
-    void deleteAssignmentByCourseAndProfessor(Long courseId, Long accountId, Long assignmentId);
+    void delete(Long courseId, Long accountId, Long assignmentId);
 }

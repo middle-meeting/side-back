@@ -2,6 +2,7 @@ package com.iny.side.assignment.application.service;
 
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
+import com.iny.side.assignment.domain.vo.AssignmentInfo;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
@@ -25,9 +26,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final CourseRepository courseRepository;
 
     @Override
-    public List<AssignmentSimpleResponseDto> findAssignmentsByCourseAndProfessor(Long courseId, Long professorId) {
+    public List<AssignmentSimpleResponseDto> getAll(Long courseId, Long professorId) {
         validateProfessorOwnsCourse(courseId, professorId);
-
         return assignmentRepository.findAllByCourseId(courseId).stream()
                 .map(AssignmentSimpleResponseDto::from)
                 .toList();
@@ -35,13 +35,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     @Transactional
-    public AssignmentSimpleResponseDto create(Long courseId, Long professorId, AssignmentCreateDto assignmentCreateDto) {
+    public AssignmentSimpleResponseDto create(Long courseId, Long professorId, AssignmentCreateDto dto) {
         Course course = validateProfessorOwnsCourse(courseId, professorId);
-        return AssignmentSimpleResponseDto.from(assignmentRepository.save(Assignment.create(course, assignmentCreateDto)));
+        Assignment assignment = Assignment.create(course, AssignmentInfo.from(dto));
+        return AssignmentSimpleResponseDto.from(assignmentRepository.save(assignment));
     }
 
     @Override
-    public AssignmentDetailResponseDto findAssignmentByCourseAndProfessor(Long courseId, Long professorId, Long assignmentId) {
+    public AssignmentDetailResponseDto get(Long courseId, Long professorId, Long assignmentId) {
         validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment", assignmentId));
@@ -52,7 +53,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     @Transactional
-    public void deleteAssignmentByCourseAndProfessor(Long courseId, Long professorId, Long assignmentId) {
+    public void delete(Long courseId, Long professorId, Long assignmentId) {
         validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment", assignmentId));

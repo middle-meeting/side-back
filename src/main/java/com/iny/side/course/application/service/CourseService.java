@@ -6,7 +6,7 @@ import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import java.util.List;
 
 public interface CourseService {
-    List<ProfessorCoursesDto> findProfessorCourses(Long professorId, String semester);
+    List<ProfessorCoursesDto> getAll(Long professorId, String semester);
 
-    List<EnrolledCoursesDto> findEnrolledCourses(Long studentId, String semester);
+    List<EnrolledCoursesDto> getAllEnrolled(Long studentId, String semester);
 }
