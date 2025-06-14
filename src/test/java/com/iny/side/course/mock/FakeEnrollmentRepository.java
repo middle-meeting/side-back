@@ -7,6 +7,7 @@ import com.iny.side.course.domain.repository.EnrollmentRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FakeEnrollmentRepository implements EnrollmentRepository {
@@ -34,5 +35,13 @@ public class FakeEnrollmentRepository implements EnrollmentRepository {
                 .filter(e -> e.getAccount().getId().equals(accountId) &&
                         e.getCourse().getSemester().equals(semester))
                 .toList();
+    }
+
+    @Override
+    public Optional<Enrollment> findByCourseIdAndStudentId(Long courseId, Long studentId) {
+        return data.stream()
+                .filter(e -> e.getCourse().getId().equals(courseId) &&
+                        e.getAccount().getId().equals(studentId))
+                .findFirst();
     }
 }

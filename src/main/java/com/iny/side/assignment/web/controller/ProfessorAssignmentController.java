@@ -1,6 +1,6 @@
 package com.iny.side.assignment.web.controller;
 
-import com.iny.side.assignment.application.service.AssignmentService;
+import com.iny.side.assignment.application.service.ProfessorAssignmentService;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
@@ -14,41 +14,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/professor")
 @RequiredArgsConstructor
 public class ProfessorAssignmentController {
 
-    private final AssignmentService assignmentService;
+    private final ProfessorAssignmentService professorAssignmentService;
 
-    @GetMapping(value = "/professor/courses/{courseId}/assignments")
+    @GetMapping(value = "/courses/{courseId}/assignments")
     public ResponseEntity<BasicResponse<List<AssignmentSimpleResponseDto>>> getAll(
             @AuthenticationPrincipal AccountResponseDto professor,
             @PathVariable Long courseId) {
-        return ResponseEntity.ok(BasicResponse.ok(assignmentService.getAll(courseId, professor.id())));
+        return ResponseEntity.ok(BasicResponse.ok(professorAssignmentService.getAll(courseId, professor.id())));
     }
 
-    @PostMapping(value = "/professor/courses/{courseId}/assignments")
+    @PostMapping(value = "/courses/{courseId}/assignments")
     public ResponseEntity<BasicResponse<AssignmentSimpleResponseDto>> create(
             @AuthenticationPrincipal AccountResponseDto professor,
             @PathVariable Long courseId,
             @RequestBody AssignmentCreateDto createDto) {
-        return ResponseEntity.ok(BasicResponse.ok(assignmentService.create(courseId, professor.id(), createDto)));
+        return ResponseEntity.ok(BasicResponse.ok(professorAssignmentService.create(courseId, professor.id(), createDto)));
     }
 
-    @GetMapping(value = "/professor/courses/{courseId}/assignments/{assignmentId}")
+    @GetMapping(value = "/courses/{courseId}/assignments/{assignmentId}")
     public ResponseEntity<BasicResponse<AssignmentDetailResponseDto>> get(
             @AuthenticationPrincipal AccountResponseDto professor,
             @PathVariable Long courseId,
             @PathVariable Long assignmentId) {
-        return ResponseEntity.ok(BasicResponse.ok(assignmentService.get(courseId, professor.id(), assignmentId)));
+        return ResponseEntity.ok(BasicResponse.ok(professorAssignmentService.get(courseId, professor.id(), assignmentId)));
     }
 
-    @DeleteMapping(value = "/professor/courses/{courseId}/assignments/{assignmentId}")
+    @DeleteMapping(value = "/courses/{courseId}/assignments/{assignmentId}")
     public ResponseEntity<BasicResponse<Void>> delete(
             @AuthenticationPrincipal AccountResponseDto accountResponseDto,
             @PathVariable Long courseId,
             @PathVariable Long assignmentId) {
-        assignmentService.delete(courseId, accountResponseDto.id(), assignmentId);
+        professorAssignmentService.delete(courseId, accountResponseDto.id(), assignmentId);
         return ResponseEntity.ok(BasicResponse.ok());
     }
 

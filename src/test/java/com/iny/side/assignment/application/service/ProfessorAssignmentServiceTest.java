@@ -22,9 +22,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class AssignmentServiceTest {
+class ProfessorAssignmentServiceTest {
 
-    private AssignmentService assignmentService;
+    private ProfessorAssignmentService professorAssignmentService;
     private FakeAssignmentRepository fakeAssignmentRepository;
     private FakeCourseRepository fakeCourseRepository;
     private FakeUserRepository fakeUserRepository;
@@ -40,7 +40,7 @@ class AssignmentServiceTest {
         fakeCourseRepository = new FakeCourseRepository();
         fakeUserRepository = new FakeUserRepository();
 
-        assignmentService = AssignmentServiceImpl.builder()
+        professorAssignmentService = ProfessorAssignmentServiceImpl.builder()
                 .assignmentRepository(fakeAssignmentRepository)
                 .courseRepository(fakeCourseRepository)
                 .build();
@@ -124,7 +124,7 @@ class AssignmentServiceTest {
     @Test
     void 교수는_본인_강의의_과제_여러개_정상조회() {
         // when
-        List<AssignmentSimpleResponseDto> result = assignmentService.getAll(testCourse.getId(), professor.getId());
+        List<AssignmentSimpleResponseDto> result = professorAssignmentService.getAll(testCourse.getId(), professor.getId());
 
         // then
         assertThat(result)
@@ -151,7 +151,7 @@ class AssignmentServiceTest {
         );
 
         // when
-        AssignmentSimpleResponseDto result = assignmentService.create(testCourse.getId(), professor.getId(), createDto);
+        AssignmentSimpleResponseDto result = professorAssignmentService.create(testCourse.getId(), professor.getId(), createDto);
 
         // then
         assertThat(result.title()).isEqualTo("심부전 케이스");
@@ -176,7 +176,7 @@ class AssignmentServiceTest {
                 LocalDateTime.of(2025, 7, 15, 18, 0)
         );
         assertThatThrownBy(() ->
-                assignmentService.create(testCourse.getId(), otherProfessor.getId(), createDto)
+                professorAssignmentService.create(testCourse.getId(), otherProfessor.getId(), createDto)
         ).isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("본인의 강의가 아닙니다");
     }
@@ -197,7 +197,7 @@ class AssignmentServiceTest {
                 LocalDateTime.of(2025, 7, 15, 18, 0)
         );
         assertThatThrownBy(() ->
-                assignmentService.create(99999L, professor.getId(), createDto)
+                professorAssignmentService.create(99999L, professor.getId(), createDto)
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Course", 99999);
     }
@@ -206,7 +206,7 @@ class AssignmentServiceTest {
     void 교수_본인_강의의_과제_상세조회_정상_조회() {
         // given
         // when
-        AssignmentDetailResponseDto detail = assignmentService.get(
+        AssignmentDetailResponseDto detail = professorAssignmentService.get(
                 testCourse.getId(), professor.getId(), testAssignment.getId());
 
         // then
@@ -220,7 +220,7 @@ class AssignmentServiceTest {
     void 교수는_타교수_강의의_과제_상세조회_불가() {
         // when & then
         assertThatThrownBy(() ->
-                assignmentService.get(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
+                professorAssignmentService.get(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("본인의 강의가 아닙니다");
     }
@@ -228,7 +228,7 @@ class AssignmentServiceTest {
     @Test
     void 존재하지_않는_강의에는_상세조회_불가() {
         assertThatThrownBy(() ->
-                assignmentService.get(99999L, professor.getId(), testAssignment.getId())
+                professorAssignmentService.get(99999L, professor.getId(), testAssignment.getId())
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Course");
     }
@@ -236,7 +236,7 @@ class AssignmentServiceTest {
     @Test
     void 존재하지_않는_과제는_상세조회_불가() {
         assertThatThrownBy(() ->
-                assignmentService.get(testCourse.getId(), professor.getId(), 88888L)
+                professorAssignmentService.get(testCourse.getId(), professor.getId(), 88888L)
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Assignment");
     }
@@ -251,7 +251,7 @@ class AssignmentServiceTest {
         Course savedCourse = fakeCourseRepository.save(otherCourse);
 
         assertThatThrownBy(() ->
-                assignmentService.get(savedCourse.getId(), professor.getId(), testAssignment.getId())
+                professorAssignmentService.get(savedCourse.getId(), professor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("해당 강의의 과제가 아닙니다");
     }
@@ -260,7 +260,7 @@ class AssignmentServiceTest {
     void 과제_삭제_정상() {
         // given
         // when
-        assignmentService.delete(testCourse.getId(), professor.getId(), testAssignment.getId());
+        professorAssignmentService.delete(testCourse.getId(), professor.getId(), testAssignment.getId());
         // then
         assertThat(fakeAssignmentRepository.findByAssignmentId(testAssignment.getId())).isEmpty();
     }
@@ -268,7 +268,7 @@ class AssignmentServiceTest {
     @Test
     void 존재하지_않는_강의는_삭제_불가() {
         assertThatThrownBy(() ->
-                assignmentService.delete(99999L, professor.getId(), testAssignment.getId())
+                professorAssignmentService.delete(99999L, professor.getId(), testAssignment.getId())
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Course");
     }
@@ -276,7 +276,7 @@ class AssignmentServiceTest {
     @Test
     void 존재하지_않는_과제는_삭제_불가() {
         assertThatThrownBy(() ->
-                assignmentService.delete(testCourse.getId(), professor.getId(), 88888L)
+                professorAssignmentService.delete(testCourse.getId(), professor.getId(), 88888L)
         ).isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Assignment");
     }
@@ -284,7 +284,7 @@ class AssignmentServiceTest {
     @Test
     void 교수는_타교수_강의의_과제_삭제_불가() {
         assertThatThrownBy(() ->
-                assignmentService.delete(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
+                professorAssignmentService.delete(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("본인의 강의가 아닙니다");
     }
@@ -299,7 +299,7 @@ class AssignmentServiceTest {
         Course savedCourse = fakeCourseRepository.save(otherCourse);
 
         assertThatThrownBy(() ->
-                assignmentService.delete(savedCourse.getId(), professor.getId(), testAssignment.getId())
+                professorAssignmentService.delete(savedCourse.getId(), professor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("해당 강의의 과제가 아닙니다");
     }

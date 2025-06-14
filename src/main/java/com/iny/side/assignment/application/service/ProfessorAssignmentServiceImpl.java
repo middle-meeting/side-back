@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @Builder
 @RequiredArgsConstructor
-public class AssignmentServiceImpl implements AssignmentService {
+public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final CourseRepository courseRepository;
@@ -45,7 +45,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     public AssignmentDetailResponseDto get(Long courseId, Long professorId, Long assignmentId) {
         validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
-                .orElseThrow(() -> new NotFoundException("Assignment", assignmentId));
+                .orElseThrow(() -> new NotFoundException("Assignment"));
         validateAssignmentBelongsToCourse(courseId, assignment);
         return AssignmentDetailResponseDto.from(assignment);
     }
@@ -56,7 +56,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     public void delete(Long courseId, Long professorId, Long assignmentId) {
         validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
-                .orElseThrow(() -> new NotFoundException("Assignment", assignmentId));
+                .orElseThrow(() -> new NotFoundException("Assignment"));
         validateAssignmentBelongsToCourse(courseId, assignment);
         assignmentRepository.delete(assignment);
     }
@@ -69,7 +69,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     private Course validateProfessorOwnsCourse(Long courseId, Long professorId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course", courseId));
+                .orElseThrow(() -> new NotFoundException("Course"));
         course.validateOwner(professorId);
         return course;
     }

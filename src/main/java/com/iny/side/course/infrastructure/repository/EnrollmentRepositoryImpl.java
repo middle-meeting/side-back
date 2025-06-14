@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,6 +17,11 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
     @Override
     public List<Enrollment> findAllByAccountIdAndSemester(Long accountId, String semester) {
         return enrollmentJpaRepository.findAllByAccountIdAndSemester(accountId, semester);
+    }
+
+    @Override
+    public Optional<Enrollment> findByCourseIdAndStudentId(Long courseId, Long studentId) {
+        return enrollmentJpaRepository.findByCourseIdAndAccountId(courseId, studentId);
     }
 
 }
