@@ -1,7 +1,7 @@
 package com.iny.side.course.web.controller;
 
 
-import com.iny.side.common.BasicResponse;
+import com.iny.side.common.response.BasicResponse;
 import com.iny.side.course.application.service.CourseService;
 import com.iny.side.course.web.dto.MyCoursesDto;
 import com.iny.side.users.web.dto.AccountResponseDto;

@@ -3,7 +3,7 @@ package com.iny.side.assignment.web.controller;
 import com.iny.side.assignment.application.service.AssignmentService;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentResponseDto;
-import com.iny.side.common.BasicResponse;
+import com.iny.side.common.response.BasicResponse;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

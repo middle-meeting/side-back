@@ -1,4 +1,4 @@
-package com.iny.side.common;
+package com.iny.side.common.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

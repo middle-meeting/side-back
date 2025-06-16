@@ -1,8 +1,10 @@
 package com.iny.side.common.exception;
 
-import com.iny.side.common.BasicResponse;
-import com.iny.side.common.ErrorDetail;
-import com.iny.side.common.ErrorPayload;
+import com.iny.side.common.response.BasicResponse;
+import com.iny.side.common.response.ErrorDetail;
+import com.iny.side.common.response.ErrorPayload;
+import org.springframework.context.MessageSource;
+import java.util.Locale;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +15,12 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final MessageSource messageSource;
+
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BasicResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
@@ -30,7 +38,7 @@ public class GlobalExceptionHandler {
 
         BasicResponse<?> response = BasicResponse.error(
                 HttpStatus.BAD_REQUEST,
-                "입력값 검증 실패",
+                messageSource.getMessage("error.validation", null, Locale.getDefault()),
                 errorPayload
         );
 
@@ -39,9 +47,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<BasicResponse<?>> handleBusinessException(BusinessException ex) {
+        String message = messageSource.getMessage(ex.getMessageCode(), ex.getArgs(), Locale.getDefault());
         ErrorDetail errorDetail = ErrorDetail.builder()
-                .code("BUSINESS_ERROR")
-                .message(ex.getMessage())
+                .code(ex.getMessageCode())
+                .message(message)
                 .build();
 
         ErrorPayload errorPayload = ErrorPayload.builder()
@@ -50,7 +59,7 @@ public class GlobalExceptionHandler {
 
         BasicResponse<?> response = BasicResponse.error(
                 ex.getHttpStatus(),
-                ex.getMessage(),
+                message,
                 errorPayload
         );
 
@@ -59,9 +68,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<BasicResponse<?>> handleRuntimeException(RuntimeException ex) {
+        String message = messageSource.getMessage("error.internal", null, Locale.getDefault());
         ErrorDetail errorDetail = ErrorDetail.builder()
-                .code("INTERNAL_SERVER_ERROR")
-                .message("예상치 못한 서버 오류가 발생했습니다.")
+                .code("error.internal")
+                .message(message)
                 .build();
 
         ErrorPayload errorPayload = ErrorPayload.builder()
@@ -70,7 +80,7 @@ public class GlobalExceptionHandler {
 
         BasicResponse<?> response = BasicResponse.error(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "서버 내부 오류",
+                message,
                 errorPayload
         );
 

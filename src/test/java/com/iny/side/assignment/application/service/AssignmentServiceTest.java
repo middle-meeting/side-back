@@ -9,6 +9,7 @@ import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
+import com.iny.side.common.TestDataFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,52 +40,19 @@ class AssignmentServiceTest {
                 .courseRepository(fakeCourseRepository)
                 .build();
 
-        professorAccount1 = Account.builder()
-                .username("test1@test.com")
-                .password("123123123")
-                .name("이교수")
-                .role(Role.PROFESSOR)
-                .build();
+        professorAccount1 = TestDataFactory.createAccount(1L, "test1@test.com", Role.PROFESSOR);
         professorAccount1 = fakeUserRepository.save(professorAccount1);
 
-        testCourse1 = Course.builder()
-                .name("이교수의 케이스스터디")
-                .semester("202501")
-                .account(professorAccount1)
-                .build();
+        testCourse1 = TestDataFactory.createCourse("이교수의 케이스스터디", "202501", professorAccount1);
         testCourse1 = fakeCourseRepository.save(testCourse1);
 
-        Assignment testAssignment1 = Assignment.builder()
-                .title("첫번째과제")
-                .personaName("김환자")
-                .personaAge(18)
-                .personaGender(GenderType.MALE)
-                .personaSymptom("가슴 통증")
-                .personaHistory("과거 심장질환 병력 있음")
-                .personaPersonality("침착함")
-                .personaDisease("고혈압")
-                .objective("심장 질환 감별 및 대처법 교육")
-                .maxTurns(10)
-                .dueDate(LocalDateTime.of(2025, 6, 30, 23, 0))
-                .account(professorAccount1)
-                .course(testCourse1)
-                .build();
+        Assignment testAssignment1 = TestDataFactory.createAssignment(
+                "첫번째과제", professorAccount1, testCourse1, LocalDateTime.of(2025, 6, 30, 23, 0)
+        );
 
-        Assignment testAssignment2 = Assignment.builder()
-                .title("두번째과제")
-                .personaName("박환자")
-                .personaAge(35)
-                .personaGender(GenderType.FEMALE)
-                .personaSymptom("복부 통증과 메스꺼움")
-                .personaHistory("과거 위염 진단 경험")
-                .personaPersonality("걱정이 많음")
-                .personaDisease("위염")
-                .objective("소화기 질환 초기진단 및 생활습관 개선 교육")
-                .maxTurns(20)
-                .dueDate(LocalDateTime.of(2025, 6, 29, 18, 0))
-                .account(professorAccount1)
-                .course(testCourse1)
-                .build();
+        Assignment testAssignment2 = TestDataFactory.createAssignment(
+                "두번째과제", professorAccount1, testCourse1, LocalDateTime.of(2025, 6, 29, 18, 0)
+        );
 
         fakeAssignmentRepository.save(testAssignment1);
         fakeAssignmentRepository.save(testAssignment2);
