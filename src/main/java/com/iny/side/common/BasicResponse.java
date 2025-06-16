@@ -14,6 +14,10 @@ public class BasicResponse<T> {
     private final T data;
     private final ErrorPayload error;
 
+    public static <T> BasicResponse<T> ok() {
+        return ok(null, "성공");
+    }
+
     public static <T> BasicResponse<T> ok(T data) {
         return ok(data, "성공");
     }

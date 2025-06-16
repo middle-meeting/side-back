@@ -1,10 +1,12 @@
 package com.iny.side.course.application.service;
 
-import com.iny.side.course.web.dto.MyCoursesDto;
-import com.iny.side.users.web.dto.AccountResponseDto;
+import com.iny.side.course.web.dto.EnrolledCoursesDto;
+import com.iny.side.course.web.dto.ProfessorCoursesDto;
 
 import java.util.List;
 
 public interface CourseService {
-    List<MyCoursesDto> findMyCourse(AccountResponseDto accountResponseDto, String semester);
+    List<ProfessorCoursesDto> getAll(Long professorId, String semester);
+
+    List<EnrolledCoursesDto> getAllEnrolled(Long studentId, String semester);
 }

@@ -15,12 +15,22 @@ public class AssignmentRepositoryImpl implements AssignmentRepository {
     private final AssignmentJpaRepository assignmentJpaRepository;
 
     @Override
-    public List<Assignment> findByCourseId(Long courseId) {
-        return assignmentJpaRepository.findByCourseId(courseId);
+    public List<Assignment> findAllByCourseId(Long courseId) {
+        return assignmentJpaRepository.findAllByCourseId(courseId);
     }
 
     @Override
     public Assignment save(Assignment assignment) {
         return assignmentJpaRepository.save(assignment);
+    }
+
+    @Override
+    public Optional<Assignment> findByAssignmentId(Long assignmentId) {
+        return assignmentJpaRepository.findById(assignmentId);
+    }
+
+    @Override
+    public void delete(Assignment assignment) {
+        assignmentJpaRepository.delete(assignment);
     }
 }

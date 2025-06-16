@@ -25,7 +25,7 @@ public class Course {
     private String semester;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "professor_id")
     private Account account;
 
     @Builder

@@ -1,10 +1,10 @@
 package com.iny.side.assignment.domain.entity;
 
+import com.iny.side.assignment.domain.vo.AssignmentInfo;
 import com.iny.side.assignment.exception.InvalidAssignmentDueDateException;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
-import com.iny.side.users.domain.entity.Account;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,6 +33,7 @@ public class Assignment {
     private Integer personaAge;
 
     @Column(name = "persona_gender", nullable = false)
+    @Enumerated(EnumType.STRING)
     private GenderType personaGender;
 
     @Column(name = "persona_symptom", nullable = false)
@@ -57,15 +58,11 @@ public class Assignment {
     private LocalDateTime dueDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id")
-    private Account account;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
 
     @Builder
-    public Assignment(Long id, String title, String personaName, Integer personaAge, GenderType personaGender, String personaSymptom, String personaHistory, String personaPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Account account, Course course) {
+    public Assignment(Long id, String title, String personaName, Integer personaAge, GenderType personaGender, String personaSymptom, String personaHistory, String personaPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Course course) {
         this.id = id;
         this.title = title;
         this.personaName = personaName;
@@ -78,28 +75,26 @@ public class Assignment {
         this.objective = objective;
         this.maxTurns = maxTurns;
         this.dueDate = dueDate;
-        this.account = account;
         this.course = course;
     }
 
-    public static Assignment create(Course course, AssignmentCreateDto dto) {
-        if (dto.dueDate().getMinute() % 30 != 0 || dto.dueDate().getSecond() != 0 || dto.dueDate().getNano() != 0) {
+    public static Assignment create(Course course, AssignmentInfo info) {
+        if (info.dueDate().getMinute() % 30 != 0 || info.dueDate().getSecond() != 0 || info.dueDate().getNano() != 0) {
             throw new InvalidAssignmentDueDateException();
         }
 
         return Assignment.builder()
-                .title(dto.title())
-                .personaName(dto.personaName())
-                .personaAge(dto.personaAge())
-                .personaGender(dto.personaGender())
-                .personaSymptom(dto.personaSymptom())
-                .personaHistory(dto.personaHistory())
-                .personaPersonality(dto.personaPersonality())
-                .personaDisease(dto.personaDisease())
-                .objective(dto.objective())
-                .maxTurns(dto.maxTurns())
-                .dueDate(dto.dueDate())
-                .account(course.getAccount())
+                .title(info.title())
+                .personaName(info.personaName())
+                .personaAge(info.personaAge())
+                .personaGender(info.personaGender())
+                .personaSymptom(info.personaSymptom())
+                .personaHistory(info.personaHistory())
+                .personaPersonality(info.personaPersonality())
+                .personaDisease(info.personaDisease())
+                .objective(info.objective())
+                .maxTurns(info.maxTurns())
+                .dueDate(info.dueDate())
                 .course(course)
                 .build();
     }

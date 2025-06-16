@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface CourseRepository {
 
-    List<Course> findMyCourseBySemester(Long accountId, String semester);
+    List<Course> findAllByAccountIdAndSemester(Long accountId, String semester);
 
     Optional<Course> findById(Long courseId);
 }

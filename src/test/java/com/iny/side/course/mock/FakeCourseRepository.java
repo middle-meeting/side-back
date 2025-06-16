@@ -31,7 +31,7 @@ public class FakeCourseRepository implements CourseRepository {
     }
 
     @Override
-    public List<Course> findMyCourseBySemester(Long accountId, String semester) {
+    public List<Course> findAllByAccountIdAndSemester(Long accountId, String semester) {
         return data.stream()
                 .filter(c -> c.getAccount().getId().equals(accountId) &&
                         c.getSemester().equals(semester))
