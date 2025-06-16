@@ -1,8 +1,8 @@
 package com.iny.side.assignment.web.controller;
 
-import com.iny.side.assignment.application.service.ProfessorAssignmentService;
 import com.iny.side.assignment.application.service.StudentAssignmentService;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
 import com.iny.side.common.BasicResponse;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +27,13 @@ public class StudentAssignmentController {
             @AuthenticationPrincipal AccountResponseDto student,
             @PathVariable Long courseId) {
         return ResponseEntity.ok(BasicResponse.ok(studentAssignmentService.getAll(courseId, student.id())));
+    }
+
+    @GetMapping(value = "/courses/{courseId}/assignments/{assignmentId}")
+    public ResponseEntity<BasicResponse<StudentAssignmentDetailResponseDto>> get(
+            @AuthenticationPrincipal AccountResponseDto student,
+            @PathVariable Long courseId,
+            @PathVariable Long assignmentId) {
+        return ResponseEntity.ok(BasicResponse.ok(studentAssignmentService.get(courseId, student.id(), assignmentId)));
     }
 }

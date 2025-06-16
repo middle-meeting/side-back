@@ -4,8 +4,8 @@ import com.iny.side.account.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
-import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
@@ -178,7 +178,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.create(testCourse.getId(), otherProfessor.getId(), createDto)
         ).isInstanceOf(ForbiddenException.class)
-                ;
+        ;
     }
 
     @Test
@@ -199,14 +199,14 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.create(99999L, professor.getId(), createDto)
         ).isInstanceOf(NotFoundException.class)
-                ;
+        ;
     }
 
     @Test
     void 교수_본인_강의의_과제_상세조회_정상_조회() {
         // given
         // when
-        AssignmentDetailResponseDto detail = professorAssignmentService.get(
+        ProfessorAssignmentDetailResponseDto detail = professorAssignmentService.get(
                 testCourse.getId(), professor.getId(), testAssignment.getId());
 
         // then
@@ -222,7 +222,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.get(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
-                ;
+        ;
     }
 
     @Test
@@ -230,7 +230,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.get(99999L, professor.getId(), testAssignment.getId())
         ).isInstanceOf(NotFoundException.class)
-                ;
+        ;
     }
 
     @Test
@@ -238,7 +238,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.get(testCourse.getId(), professor.getId(), 88888L)
         ).isInstanceOf(NotFoundException.class)
-                ;
+        ;
     }
 
     @Test
@@ -253,7 +253,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.get(savedCourse.getId(), professor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
-                ;
+        ;
     }
 
     @Test
@@ -270,7 +270,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.delete(99999L, professor.getId(), testAssignment.getId())
         ).isInstanceOf(NotFoundException.class)
-                ;
+        ;
     }
 
     @Test
@@ -278,7 +278,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.delete(testCourse.getId(), professor.getId(), 88888L)
         ).isInstanceOf(NotFoundException.class)
-                ;
+        ;
     }
 
     @Test
@@ -286,7 +286,7 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.delete(testCourse.getId(), otherProfessor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
-                ;
+        ;
     }
 
     @Test
@@ -301,6 +301,6 @@ class ProfessorAssignmentServiceTest {
         assertThatThrownBy(() ->
                 professorAssignmentService.delete(savedCourse.getId(), professor.getId(), testAssignment.getId())
         ).isInstanceOf(ForbiddenException.class)
-                ;
+        ;
     }
 }

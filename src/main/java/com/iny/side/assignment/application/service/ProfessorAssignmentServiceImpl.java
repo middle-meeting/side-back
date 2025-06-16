@@ -4,8 +4,8 @@ import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.assignment.domain.vo.AssignmentInfo;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
-import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.entity.Course;
@@ -42,12 +42,12 @@ public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentServic
     }
 
     @Override
-    public AssignmentDetailResponseDto get(Long courseId, Long professorId, Long assignmentId) {
+    public ProfessorAssignmentDetailResponseDto get(Long courseId, Long professorId, Long assignmentId) {
         validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment"));
         validateAssignmentBelongsToCourse(courseId, assignment);
-        return AssignmentDetailResponseDto.from(assignment);
+        return ProfessorAssignmentDetailResponseDto.from(assignment);
     }
 
 

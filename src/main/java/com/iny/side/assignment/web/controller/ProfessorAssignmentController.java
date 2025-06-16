@@ -2,8 +2,8 @@ package com.iny.side.assignment.web.controller;
 
 import com.iny.side.assignment.application.service.ProfessorAssignmentService;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
-import com.iny.side.assignment.web.dto.AssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
 import com.iny.side.common.BasicResponse;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class ProfessorAssignmentController {
     }
 
     @GetMapping(value = "/courses/{courseId}/assignments/{assignmentId}")
-    public ResponseEntity<BasicResponse<AssignmentDetailResponseDto>> get(
+    public ResponseEntity<BasicResponse<ProfessorAssignmentDetailResponseDto>> get(
             @AuthenticationPrincipal AccountResponseDto professor,
             @PathVariable Long courseId,
             @PathVariable Long assignmentId) {

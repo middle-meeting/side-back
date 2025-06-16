@@ -5,7 +5,7 @@ import com.iny.side.common.domain.GenderType;
 
 import java.time.LocalDateTime;
 
-public record AssignmentDetailResponseDto(
+public record ProfessorAssignmentDetailResponseDto(
         Long id,
         String title,
         String personaName,
@@ -21,8 +21,8 @@ public record AssignmentDetailResponseDto(
         String courseName,
         String semester,
         String professorName) {
-    public static AssignmentDetailResponseDto from(Assignment assignment) {
-        return new AssignmentDetailResponseDto(
+    public static ProfessorAssignmentDetailResponseDto from(Assignment assignment) {
+        return new ProfessorAssignmentDetailResponseDto(
                 assignment.getId(),
                 assignment.getTitle(),
                 assignment.getPersonaName(),

@@ -1,8 +1,11 @@
 package com.iny.side.assignment.application.service;
 
+import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
 import com.iny.side.common.exception.ForbiddenException;
+import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.repository.EnrollmentRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +29,23 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
                 .toList();
     }
 
+    @Override
+    public StudentAssignmentDetailResponseDto get(Long courseId, Long studentId, Long assignmentId) {
+        validateStudentEnrolledCourse(courseId, studentId);
+        Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
+                .orElseThrow(() -> new NotFoundException("Assignment"));
+        validateAssignmentBelongsToCourse(courseId, assignment);
+        return StudentAssignmentDetailResponseDto.from(assignment);
+    }
+
     private void validateStudentEnrolledCourse(Long courseId, Long studentId) {
         enrollmentRepository.findByCourseIdAndStudentId(courseId, studentId)
                 .orElseThrow(() -> new ForbiddenException("forbidden.not_enrolled"));
+    }
+
+    private static void validateAssignmentBelongsToCourse(Long courseId, Assignment assignment) {
+        if (!assignment.getCourse().getId().equals(courseId)) {
+            throw new ForbiddenException("forbidden.assignment_not_in_course");
+        }
     }
 }
