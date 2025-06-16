@@ -63,7 +63,7 @@ public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentServic
 
     private static void validateAssignmentBelongsToCourse(Long courseId, Assignment assignment) {
         if (!assignment.getCourse().getId().equals(courseId)) {
-            throw new ForbiddenException("해당 강의의 과제가 아닙니다.");
+            throw new ForbiddenException("forbidden.assignment_not_in_course");
         }
     }
 

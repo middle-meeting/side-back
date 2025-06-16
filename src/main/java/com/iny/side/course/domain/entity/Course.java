@@ -38,7 +38,7 @@ public class Course {
 
     public void validateOwner(Long professorId) {
         if (!this.account.getId().equals(professorId)) {
-            throw new ForbiddenException("본인의 강의가 아닙니다.");
+            throw new ForbiddenException("forbidden.not_your_course");
         }
     }
 }
