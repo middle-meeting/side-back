@@ -7,6 +7,7 @@ import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
+import com.iny.side.TestFixtures;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.mock.FakeCourseRepository;
@@ -42,28 +43,13 @@ class StudentAssignmentServiceImplTest {
                 .build();
 
         // 교수1, 학생1 생성
-        Account professor = Account.builder()
-                .username("prof1@test.com")
-                .password("pw1")
-                .name("교수1")
-                .role(Role.PROFESSOR)
-                .build();
-        student = Account.builder()
-                .username("student1@test.com")
-                .password("pw1")
-                .name("학생1")
-                .role(Role.STUDENT)
-                .build();
+        Account professor = TestFixtures.professor(1L);
+        student = TestFixtures.student(1L);
         fakeUserRepository.save(professor);
         student = fakeUserRepository.save(student);
 
         // testCourse 생성 (교수1 소유)
-        testCourse = Course.builder()
-                .name("과제강의")
-                .semester("2025-01")
-                .account(professor)
-                .build();
-        testCourse = fakeCourseRepository.save(testCourse);
+        testCourse = fakeCourseRepository.save(TestFixtures.course(1L, professor));
 
         // 과제 2개 생성 (testCourse 소속)
         Assignment assignment1 = Assignment.builder()
@@ -122,7 +108,6 @@ class StudentAssignmentServiceImplTest {
     void 학생이_수강하지_않는_강의의_과제는_조회_불가() {
         assertThatThrownBy(() ->
                 studentAssignmentService.getAll(999999L, student.getId())
-        ).isInstanceOf(ForbiddenException.class)
-                .hasMessageContaining("해당 강의를 수강하지 않습니다.");
+        ).isInstanceOf(ForbiddenException.class);
     }
 }

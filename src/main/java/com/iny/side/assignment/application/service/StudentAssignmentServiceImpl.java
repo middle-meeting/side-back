@@ -28,6 +28,6 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
 
     private void validateStudentEnrolledCourse(Long courseId, Long studentId) {
         enrollmentRepository.findByCourseIdAndStudentId(courseId, studentId)
-                .orElseThrow(() -> new ForbiddenException("해당 강의를 수강하지 않습니다."));
+                .orElseThrow(() -> new ForbiddenException("forbidden.not_enrolled"));
     }
 }
