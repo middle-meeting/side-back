@@ -4,6 +4,7 @@ import com.iny.side.account.mock.FakeUserRepository;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.course.web.dto.MyCoursesDto;
+import com.iny.side.common.TestDataFactory;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.web.dto.AccountResponseDto;
@@ -29,59 +30,19 @@ class CourseServiceTest {
                 .courseRepository(fakeCourseRepository)
                 .build();
 
-        Account 김학생 = Account.builder()
-                .id(1L)
-                .username("test@test.com")
-                .password("123123123")
-                .name("김학생")
-                .role(Role.STUDENT)
-                .build();
-        Account 이교수 = Account.builder()
-                .id(2L)
-                .username("test1@test.com")
-                .password("123123123")
-                .name("이교수")
-                .role(Role.PROFESSOR)
-                .build();
-        Account 왕선생 = Account.builder()
-                .id(3L)
-                .username("test2@test.com")
-                .password("123123123")
-                .name("왕선생")
-                .role(Role.PROFESSOR)
-                .build();
-        Account 박관리 = Account.builder()
-                .id(4L)
-                .username("test3@test.com")
-                .password("123123123")
-                .name("박관리")
-                .role(Role.ADMIN)
-                .build();
+        Account 김학생 = TestDataFactory.createAccount(1L, "test@test.com", Role.STUDENT);
+        Account 이교수 = TestDataFactory.createAccount(2L, "test1@test.com", Role.PROFESSOR);
+        Account 왕선생 = TestDataFactory.createAccount(3L, "test2@test.com", Role.PROFESSOR);
+        Account 박관리 = TestDataFactory.createAccount(4L, "test3@test.com", Role.ADMIN);
         fakeUserRepository.save(김학생);
         fakeUserRepository.save(이교수);
         fakeUserRepository.save(왕선생);
         fakeUserRepository.save(박관리);
 
-        Course 신경학 = Course.builder()
-                .name("신경학")
-                .semester("202402")
-                .account(이교수)
-                .build();
-        Course 한의학입문 = Course.builder()
-                .name("한의학 입문")
-                .semester("202501")
-                .account(이교수)
-                .build();
-        Course 인체학입문 = Course.builder()
-                .name("인체학 입문")
-                .semester("202501")
-                .account(이교수)
-                .build();
-        Course 소프트웨어공학입문 = Course.builder()
-                .name("소프트웨어공학 입문")
-                .semester("202501")
-                .account(왕선생)
-                .build();
+        Course 신경학 = TestDataFactory.createCourse("신경학", "202402", 이교수);
+        Course 한의학입문 = TestDataFactory.createCourse("한의학 입문", "202501", 이교수);
+        Course 인체학입문 = TestDataFactory.createCourse("인체학 입문", "202501", 이교수);
+        Course 소프트웨어공학입문 = TestDataFactory.createCourse("소프트웨어공학 입문", "202501", 왕선생);
 
         fakeCourseRepository.save(신경학);
         fakeCourseRepository.save(한의학입문);

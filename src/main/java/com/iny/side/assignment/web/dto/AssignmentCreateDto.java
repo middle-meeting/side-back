@@ -1,8 +1,6 @@
 package com.iny.side.assignment.web.dto;
 
-import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.common.domain.GenderType;
-import com.iny.side.course.domain.entity.Course;
 import jakarta.validation.constraints.Future;
 
 import java.time.LocalDateTime;
@@ -12,21 +10,4 @@ public record AssignmentCreateDto(String title, String personaName, int personaA
                                   String personaDisease, String objective, int maxTurns,
                                   @Future(message = "마감일이 올바르지 않습니다.")
                                   LocalDateTime dueDate) {
-    public Assignment to(Course course) {
-        return Assignment.builder()
-                .title(title)
-                .personaName(personaName)
-                .personaAge(personaAge)
-                .personaGender(personaGender)
-                .personaSymptom(personaSymptom)
-                .personaHistory(personaHistory)
-                .personaPersonality(personaPersonality)
-                .personaDisease(personaDisease)
-                .objective(objective)
-                .maxTurns(maxTurns)
-                .dueDate(dueDate)
-                .account(course.getAccount())
-                .course(course)
-                .build();
-    }
 }

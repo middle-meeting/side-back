@@ -4,10 +4,10 @@ import org.springframework.http.HttpStatus;
 
 public class NotFoundException extends BusinessException {
     public NotFoundException(String targetName, String id) {
-        super(targetName + "의 ID " + id + "이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+        super("error.not_found", HttpStatus.NOT_FOUND, targetName, id);
     }
 
     public NotFoundException(String targetName, Long id) {
-        super(targetName + "의 ID " + id + "이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+        this(targetName, String.valueOf(id));
     }
 }
