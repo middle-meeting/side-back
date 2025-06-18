@@ -1,18 +1,18 @@
 package com.iny.side.assignment.application.service;
 
+import com.iny.side.TestFixtures;
 import com.iny.side.account.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
+import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
-import com.iny.side.common.exception.NotFoundException;
-import com.iny.side.TestFixtures;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
+import com.iny.side.course.domain.repository.CourseRepository;
 import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.course.mock.FakeEnrollmentRepository;
-import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class StudentAssignmentServiceImplTest {
 
     private StudentAssignmentService studentAssignmentService;
+    private CourseRepository courseRepository;
 
     private Account student;
     private Course testCourse;
+    private Course otherCourse;
+    private Assignment testAssignment;
+    private Assignment otherAssignment;
 
     @BeforeEach
     void setUp() {
@@ -44,12 +48,13 @@ class StudentAssignmentServiceImplTest {
 
         // 교수1, 학생1 생성
         Account professor = TestFixtures.professor(1L);
-        student = TestFixtures.student(1L);
+        student = TestFixtures.student(2L);
         fakeUserRepository.save(professor);
         student = fakeUserRepository.save(student);
 
         // testCourse 생성 (교수1 소유)
         testCourse = fakeCourseRepository.save(TestFixtures.course(1L, professor));
+        otherCourse = fakeCourseRepository.save(TestFixtures.course(2L, professor));
 
         // 과제 2개 생성 (testCourse 소속)
         Assignment assignment1 = Assignment.builder()
@@ -66,7 +71,7 @@ class StudentAssignmentServiceImplTest {
                 .dueDate(LocalDateTime.of(2025, 7, 10, 14, 0))
                 .course(testCourse)
                 .build();
-        Assignment assignment2 = Assignment.builder()
+        otherAssignment = Assignment.builder()
                 .title("소화기 질환")
                 .personaName("박환자")
                 .personaAge(35)
@@ -78,10 +83,25 @@ class StudentAssignmentServiceImplTest {
                 .objective("생활습관 개선 교육")
                 .maxTurns(5)
                 .dueDate(LocalDateTime.of(2025, 7, 12, 18, 0))
+                .course(otherCourse)
+                .build();
+        testAssignment = Assignment.builder()
+                .title("상세보기용 과제")
+                .personaName("김환자")
+                .personaAge(28)
+                .personaGender(GenderType.FEMALE)
+                .personaSymptom("두통")
+                .personaHistory("특이사항 없음")
+                .personaPersonality("내성적")
+                .personaDisease("긴장성 두통")
+                .objective("두통 감별법 학습")
+                .maxTurns(8)
+                .dueDate(LocalDateTime.of(2025, 7, 25, 15, 0))
                 .course(testCourse)
                 .build();
         fakeAssignmentRepository.save(assignment1);
-        fakeAssignmentRepository.save(assignment2);
+        otherAssignment = fakeAssignmentRepository.save(otherAssignment);
+        testAssignment = fakeAssignmentRepository.save(testAssignment);
 
         // 수강신청1
         Enrollment enrollment = Enrollment.builder()
@@ -101,7 +121,7 @@ class StudentAssignmentServiceImplTest {
         assertThat(result)
                 .hasSize(2)
                 .extracting(AssignmentSimpleResponseDto::title)
-                .containsExactlyInAnyOrder("심장질환 케이스", "소화기 질환");
+                .containsExactlyInAnyOrder("심장질환 케이스", "상세보기용 과제");
     }
 
     @Test
@@ -109,5 +129,39 @@ class StudentAssignmentServiceImplTest {
         assertThatThrownBy(() ->
                 studentAssignmentService.getAll(999999L, student.getId())
         ).isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void 학생이_수강하는_강의의_과제_상세보기_정상조회() {
+        // given
+        // when
+        StudentAssignmentDetailResponseDto result = studentAssignmentService.get(
+                testCourse.getId(), student.getId(), testAssignment.getId());
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.title()).isEqualTo("상세보기용 과제");
+        assertThat(result.personaName()).isEqualTo("김환자");
+        assertThat(result.dueDate()).isEqualTo(LocalDateTime.of(2025, 7, 25, 15, 0));
+    }
+
+    @Test
+    void 학생이_수강하지_않는_강의의_과제_상세보기_불가() {
+        // when & then
+        assertThatThrownBy(() ->
+                studentAssignmentService.get(otherCourse.getId(), student.getId(), otherAssignment.getId())
+        ).isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("forbidden.not_enrolled")
+        ;
+    }
+
+    @Test
+    void 과제가_해당_강의에_속한_과제가_아니면_상세보기_불가() {
+        // when & then
+        assertThatThrownBy(() ->
+                studentAssignmentService.get(testCourse.getId(), student.getId(), otherAssignment.getId())
+        ).isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("forbidden.assignment_not_in_course")
+        ;
     }
 }
