@@ -1,4 +1,4 @@
-package com.iny.side.account.mock;
+package com.iny.side.users.mock;
 
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.domain.repository.UserRepository;
@@ -36,6 +36,12 @@ public class FakeUserRepository implements UserRepository {
                     .password(account.getPassword())
                     .name(account.getName())
                     .role(account.getRole())
+                    .school(account.getSchool())
+                    .major(account.getMajor())
+                    .grade(account.getGrade())
+                    .studentId(account.getStudentId())
+                    .employeeId(account.getEmployeeId())
+                    .emailVerified(account.getEmailVerified())
                     .build();
 
             data.add(savedAccount);

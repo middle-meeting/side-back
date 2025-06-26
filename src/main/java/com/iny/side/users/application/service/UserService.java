@@ -7,4 +7,6 @@ public interface UserService {
     Account signup(SignupDto signupDto);
 
     boolean existsByUsername(String username);
+
+    void validateSignupData(SignupDto signupDto);
 }

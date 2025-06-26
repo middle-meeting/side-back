@@ -1,6 +1,6 @@
 package com.iny.side.course.application.service;
 
-import com.iny.side.account.mock.FakeUserRepository;
+import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.mock.FakeCourseRepository;

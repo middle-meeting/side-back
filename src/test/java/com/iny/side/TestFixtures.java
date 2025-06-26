@@ -12,6 +12,10 @@ public class TestFixtures {
                 .password("pw" + id)
                 .name("교수" + id)
                 .role(Role.PROFESSOR)
+                .school("테스트대학교")
+                .major("컴퓨터공학과")
+                .employeeId("P" + String.format("%04d", id))
+                .emailVerified(true)
                 .build();
     }
 
@@ -22,6 +26,11 @@ public class TestFixtures {
                 .password("pw" + id)
                 .name("학생" + id)
                 .role(Role.STUDENT)
+                .school("테스트대학교")
+                .major("컴퓨터공학과")
+                .grade(3)
+                .studentId("2021" + String.format("%04d", id))
+                .emailVerified(true)
                 .build();
     }
 

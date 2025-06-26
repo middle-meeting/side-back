@@ -1,7 +1,7 @@
 package com.iny.side.assignment.application.service;
 
 import com.iny.side.TestFixtures;
-import com.iny.side.account.mock.FakeUserRepository;
+import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;

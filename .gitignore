@@ -55,3 +55,6 @@ Thumbs.db
 ### 테스트 리포트 ###
 test-output/
 
+### db 덤프 파일 ###
+*.sql
+
