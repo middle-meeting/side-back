@@ -58,7 +58,7 @@ public class MailgunEmailSender implements EmailSender {
                 
                 인증번호: %s
                 
-                이 인증번호는 5분간 유효합니다.
+                이 인증번호는 3분간 유효합니다.
                 인증번호를 입력하여 회원가입을 완료해주세요.
                 
                 감사합니다.
