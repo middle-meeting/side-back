@@ -3,6 +3,8 @@ package com.iny.side.users.application.service;
 import com.iny.side.users.mock.FakeEmailVerificationRepository;
 import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.users.mock.FakeVerificationCodeGenerator;
+import com.iny.side.users.mock.FakeEmailSender;
+import com.iny.side.users.mock.FakeEmailNotificationService;
 import com.iny.side.common.exception.DuplicateUsernameException;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
@@ -24,6 +26,8 @@ class UserServiceTest {
     private FakeUserRepository fakeUserRepository;
     private FakeEmailVerificationRepository fakeEmailVerificationRepository;
     private FakeVerificationCodeGenerator fakeVerificationCodeGenerator;
+    private FakeEmailSender fakeEmailSender;
+    private FakeEmailNotificationService fakeEmailNotificationService;
     private EmailVerificationService emailVerificationService;
     private PasswordEncoder passwordEncoder;
 
@@ -32,9 +36,12 @@ class UserServiceTest {
         fakeUserRepository = new FakeUserRepository();
         fakeEmailVerificationRepository = new FakeEmailVerificationRepository();
         fakeVerificationCodeGenerator = new FakeVerificationCodeGenerator();
+        fakeEmailSender = new FakeEmailSender();
+        fakeEmailNotificationService = new FakeEmailNotificationService(fakeEmailSender);
         emailVerificationService = new EmailVerificationServiceImpl(
                 fakeEmailVerificationRepository,
-                fakeVerificationCodeGenerator
+                fakeVerificationCodeGenerator,
+                fakeEmailNotificationService
         );
         passwordEncoder = new BCryptPasswordEncoder();
         userService = new UserServiceImpl(passwordEncoder, fakeUserRepository, emailVerificationService);

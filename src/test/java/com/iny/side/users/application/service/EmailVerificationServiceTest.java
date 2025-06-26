@@ -2,6 +2,8 @@ package com.iny.side.users.application.service;
 
 import com.iny.side.users.mock.FakeEmailVerificationRepository;
 import com.iny.side.users.mock.FakeVerificationCodeGenerator;
+import com.iny.side.users.mock.FakeEmailSender;
+import com.iny.side.users.mock.FakeEmailNotificationService;
 import com.iny.side.users.domain.entity.EmailVerification;
 import com.iny.side.users.web.dto.EmailVerificationConfirmDto;
 import com.iny.side.users.web.dto.EmailVerificationRequestDto;
@@ -11,20 +13,26 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EmailVerificationServiceTest {
 
     private EmailVerificationService emailVerificationService;
     private FakeEmailVerificationRepository fakeEmailVerificationRepository;
     private FakeVerificationCodeGenerator fakeVerificationCodeGenerator;
+    private FakeEmailSender fakeEmailSender;
+    private FakeEmailNotificationService fakeEmailNotificationService;
 
     @BeforeEach
     void setUp() {
         fakeEmailVerificationRepository = new FakeEmailVerificationRepository();
         fakeVerificationCodeGenerator = new FakeVerificationCodeGenerator();
+        fakeEmailSender = new FakeEmailSender();
+        fakeEmailNotificationService = new FakeEmailNotificationService(fakeEmailSender);
         emailVerificationService = new EmailVerificationServiceImpl(
                 fakeEmailVerificationRepository,
-                fakeVerificationCodeGenerator
+                fakeVerificationCodeGenerator,
+                fakeEmailNotificationService
         );
     }
 
@@ -46,6 +54,10 @@ class EmailVerificationServiceTest {
         assertThat(verification.getVerificationCode()).isEqualTo(expectedCode);
         assertThat(verification.getVerified()).isFalse();
         assertThat(fakeVerificationCodeGenerator.getCallCount()).isEqualTo(1);
+
+        // 이메일 전송 확인
+        assertThat(fakeEmailSender.wasEmailSentTo(email)).isTrue();
+        assertThat(fakeEmailSender.getLastVerificationCodeSentTo(email)).isEqualTo(expectedCode);
     }
 
     @Test
@@ -233,5 +245,41 @@ class EmailVerificationServiceTest {
 
         // then
         assertThat(fakeVerificationCodeGenerator.getCallCount()).isEqualTo(3);
+        assertThat(fakeEmailNotificationService.getEventCount()).isEqualTo(3);
+    }
+
+    @Test
+    void 이메일_전송_실패해도_인증정보는_유지된다() {
+        // given
+        String email = "test@example.com";
+        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+        fakeEmailSender.setShouldFail(true);
+
+        // when
+        emailVerificationService.sendVerificationCode(requestDto);
+
+        // then
+        // 이메일 전송 실패와 관계없이 인증 정보는 저장됨 (비즈니스 로직 분리)
+        assertThat(fakeEmailVerificationRepository.findLatestByEmail(email)).isPresent();
+        EmailVerification verification = fakeEmailVerificationRepository.findLatestByEmail(email).get();
+        assertThat(verification.getEmail()).isEqualTo(email);
+    }
+
+    @Test
+    void 이메일_전송_성공시_이메일이_정상적으로_전송된다() {
+        // given
+        String email = "test@example.com";
+        String expectedCode = "999999";
+        fakeVerificationCodeGenerator.setFixedCode(expectedCode);
+        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+
+        // when
+        emailVerificationService.sendVerificationCode(requestDto);
+
+        // then
+        assertThat(fakeEmailNotificationService.wasEventHandled(email)).isTrue();
+        assertThat(fakeEmailSender.wasEmailSentTo(email)).isTrue();
+        assertThat(fakeEmailSender.getLastVerificationCodeSentTo(email)).isEqualTo(expectedCode);
+        assertThat(fakeEmailNotificationService.getEventCount()).isEqualTo(1);
     }
 }
