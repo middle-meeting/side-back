@@ -68,6 +68,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getHttpStatus()).body(response);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<BasicResponse<?>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .code("INVALID_ARGUMENT")
+                .message(ex.getMessage())
+                .build();
+
+        ErrorPayload errorPayload = ErrorPayload.builder()
+                .errors(List.of(errorDetail))
+                .build();
+
+        BasicResponse<?> response = BasicResponse.error(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                errorPayload
+        );
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<BasicResponse<?>> handleRuntimeException(RuntimeException ex) {
         ErrorDetail errorDetail = ErrorDetail.builder()

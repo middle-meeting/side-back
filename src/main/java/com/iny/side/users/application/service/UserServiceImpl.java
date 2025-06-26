@@ -1,7 +1,7 @@
 package com.iny.side.users.application.service;
 
 import com.iny.side.common.exception.DuplicateUsernameException;
-import com.iny.side.users.domain.Role;
+import com.iny.side.common.exception.EmailNotVerifiedException;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.domain.repository.UserRepository;
 import com.iny.side.users.web.dto.SignupDto;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
         // 이메일 인증 확인
         if (!emailVerificationService.isEmailVerified(signupDto.username())) {
-            throw new IllegalArgumentException("이메일 인증이 완료되지 않았습니다.");
+            throw new EmailNotVerifiedException(signupDto.username());
         }
 
         Account account = signupDto.toAccount(passwordEncoder.encode(signupDto.password()));

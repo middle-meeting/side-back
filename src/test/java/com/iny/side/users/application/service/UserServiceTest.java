@@ -1,14 +1,11 @@
 package com.iny.side.users.application.service;
 
-import com.iny.side.users.mock.FakeEmailVerificationRepository;
-import com.iny.side.users.mock.FakeUserRepository;
-import com.iny.side.users.mock.FakeVerificationCodeGenerator;
-import com.iny.side.users.mock.FakeEmailSender;
-import com.iny.side.users.mock.FakeEmailNotificationService;
 import com.iny.side.common.exception.DuplicateUsernameException;
+import com.iny.side.common.exception.EmailNotVerifiedException;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.domain.entity.EmailVerification;
+import com.iny.side.users.mock.*;
 import com.iny.side.users.web.dto.SignupDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +49,7 @@ class UserServiceTest {
         // given
         String email = "student@test.com";
         setupEmailVerification(email);
-        
+
         SignupDto signupDto = new SignupDto(
                 email,
                 "password123",
@@ -87,7 +84,7 @@ class UserServiceTest {
         // given
         String email = "professor@test.com";
         setupEmailVerification(email);
-        
+
         SignupDto signupDto = new SignupDto(
                 email,
                 "password123",
@@ -121,7 +118,7 @@ class UserServiceTest {
         // given
         String email = "duplicate@test.com";
         setupEmailVerification(email);
-        
+
         SignupDto firstSignup = new SignupDto(
                 email, "password123", "첫번째", Role.STUDENT,
                 "테스트대학교", "컴퓨터공학과", 1, "20211111", null, "123456"
@@ -156,8 +153,7 @@ class UserServiceTest {
 
         // when & then
         assertThatThrownBy(() -> userService.signup(signupDto))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이메일 인증이 완료되지 않았습니다.");
+                .isInstanceOf(EmailNotVerifiedException.class);
     }
 
     @Test
@@ -165,7 +161,7 @@ class UserServiceTest {
         // given
         String email = "existing@test.com";
         setupEmailVerification(email);
-        
+
         SignupDto signupDto = new SignupDto(
                 email, "password123", "기존사용자", Role.STUDENT,
                 "테스트대학교", "컴퓨터공학과", 1, "20211234", null, "123456"
