@@ -2,11 +2,13 @@ package com.iny.side.users.web.dto;
 
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
+import com.iny.side.users.web.validation.ValidSignup;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+@ValidSignup
 public record SignupDto(
         @NotBlank(message = "이메일이 입력되지 않았습니다.")
         @Email(message = "이메일 형식이 올바르지 않습니다.")

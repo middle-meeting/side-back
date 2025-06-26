@@ -21,8 +21,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Account signup(SignupDto signupDto) {
-        validateSignupData(signupDto);
-
         if (existsByUsername(signupDto.username())) {
             throw new DuplicateUsernameException(signupDto.username());
         }
@@ -43,20 +41,5 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByUsername(username);
     }
 
-    @Override
-    public void validateSignupData(SignupDto signupDto) {
-        // 역할별 필수 필드 검증
-        if (signupDto.role() == Role.STUDENT) {
-            if (signupDto.grade() == null) {
-                throw new IllegalArgumentException("학년이 입력되지 않았습니다.");
-            }
-            if (signupDto.studentId() == null || signupDto.studentId().trim().isEmpty()) {
-                throw new IllegalArgumentException("학번이 입력되지 않았습니다.");
-            }
-        } else if (signupDto.role() == Role.PROFESSOR) {
-            if (signupDto.employeeId() == null || signupDto.employeeId().trim().isEmpty()) {
-                throw new IllegalArgumentException("직번이 입력되지 않았습니다.");
-            }
-        }
-    }
+
 }
