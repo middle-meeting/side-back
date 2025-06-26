@@ -1,6 +1,7 @@
 package com.iny.side.users.application.service;
 
 import com.iny.side.users.domain.entity.EmailVerification;
+import com.iny.side.users.domain.event.EmailVerificationRequestedEvent;
 import com.iny.side.users.domain.repository.EmailVerificationRepository;
 import com.iny.side.users.web.dto.EmailVerificationConfirmDto;
 import com.iny.side.users.web.dto.EmailVerificationRequestDto;
@@ -19,35 +20,36 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     private final EmailVerificationRepository emailVerificationRepository;
     private final VerificationCodeGenerator verificationCodeGenerator;
+    private final EmailNotificationService emailNotificationService;
     private static final int EXPIRATION_MINUTES = 3;
 
     @Override
     @Transactional
     public void sendVerificationCode(EmailVerificationRequestDto requestDto) {
         String email = requestDto.email();
-        
+
         // 기존 인증 코드 삭제
         emailVerificationRepository.deleteByEmail(email);
-        
+
         // 새 인증 코드 생성
         String verificationCode = verificationCodeGenerator.generateCode();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusMinutes(EXPIRATION_MINUTES);
-        
+
         EmailVerification emailVerification = EmailVerification.builder()
                 .email(email)
                 .verificationCode(verificationCode)
                 .createdAt(now)
                 .expiresAt(expiresAt)
                 .build();
-        
+
         emailVerificationRepository.save(emailVerification);
-        
-        // 실제 이메일 전송 로직 (현재는 로그로 대체)
-        log.info("인증번호 전송 - 이메일: {}, 인증번호: {}", email, verificationCode);
-        
-        // TODO: 실제 이메일 전송 서비스 연동
-        // emailSender.sendVerificationEmail(email, verificationCode);
+
+        // 도메인 이벤트 발행 (이메일 전송은 별도 처리)
+        EmailVerificationRequestedEvent event = new EmailVerificationRequestedEvent(email, verificationCode);
+        emailNotificationService.handleVerificationRequest(event);
+
+        log.info("인증번호 생성 완료 - 이메일: {}", email);
     }
 
     @Override
