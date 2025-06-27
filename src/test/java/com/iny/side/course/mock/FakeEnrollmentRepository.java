@@ -1,8 +1,10 @@
 package com.iny.side.course.mock;
 
-import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.domain.repository.EnrollmentRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,22 @@ public class FakeEnrollmentRepository implements EnrollmentRepository {
                 .filter(e -> e.getAccount().getId().equals(accountId) &&
                         e.getCourse().getSemester().equals(semester))
                 .toList();
+    }
+
+    @Override
+    public Slice<Enrollment> findAllByAccountIdAndSemester(Long accountId, String semester, Pageable pageable) {
+        List<Enrollment> filtered = data.stream()
+                .filter(e -> e.getAccount().getId().equals(accountId) &&
+                        e.getCourse().getSemester().equals(semester))
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+
+        List<Enrollment> content = start < filtered.size() ? filtered.subList(start, end) : new ArrayList<>();
+        boolean hasNext = end < filtered.size();
+
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     @Override

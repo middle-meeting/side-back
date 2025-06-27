@@ -1,6 +1,6 @@
 package com.iny.side.course.application.service;
 
-import com.iny.side.users.mock.FakeUserRepository;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.mock.FakeCourseRepository;
@@ -9,12 +9,13 @@ import com.iny.side.course.web.dto.EnrolledCoursesDto;
 import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
+import com.iny.side.users.mock.FakeUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class CourseServiceTest {
 
@@ -133,6 +134,25 @@ class CourseServiceTest {
         assertThat(result).allMatch(enrolledCourse -> enrolledCourse.professorName().equals("이교수"));
         assertThat(result).allMatch(enrolledCourse -> enrolledCourse.semester().equals("2025-01"));
         assertThat(result)
+                .extracting(EnrolledCoursesDto::name)
+                .containsExactlyInAnyOrder("인체학 입문");
+    }
+
+    @Test
+    void 학생은_해당학기에_본인이_수강하는_과목을_페이징하여_조회_가능() {
+        // when
+        SliceResponse<EnrolledCoursesDto> result = courseService.getAllEnrolled(student.getId(), "2025-01", 0);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getPage()).isEqualTo(0);
+        assertThat(result.getSize()).isEqualTo(12);
+        assertThat(result.isHasNext()).isFalse();
+        assertThat(result.isFirst()).isTrue();
+        assertThat(result.isLast()).isTrue();
+        assertThat(result.getContent()).allMatch(enrolledCourse -> enrolledCourse.professorName().equals("이교수"));
+        assertThat(result.getContent()).allMatch(enrolledCourse -> enrolledCourse.semester().equals("2025-01"));
+        assertThat(result.getContent())
                 .extracting(EnrolledCoursesDto::name)
                 .containsExactlyInAnyOrder("인체학 입문");
     }

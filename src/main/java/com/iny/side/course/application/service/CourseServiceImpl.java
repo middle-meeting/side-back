@@ -1,14 +1,16 @@
 package com.iny.side.course.application.service;
 
-import com.iny.side.course.domain.entity.Course;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.domain.repository.CourseRepository;
 import com.iny.side.course.domain.repository.EnrollmentRepository;
 import com.iny.side.course.web.dto.EnrolledCoursesDto;
 import com.iny.side.course.web.dto.ProfessorCoursesDto;
-import com.iny.side.users.web.dto.AccountResponseDto;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,5 +35,17 @@ public class CourseServiceImpl implements CourseService {
         return enrollmentRepository.findAllByAccountIdAndSemester(studentId, semester).stream()
                 .map(EnrolledCoursesDto::from)
                 .toList();
+    }
+
+    @Override
+    public SliceResponse<EnrolledCoursesDto> getAllEnrolled(Long studentId, String semester, int page) {
+        Pageable pageable = PageRequest.of(page, 12);
+        Slice<Enrollment> enrollmentSlice = enrollmentRepository.findAllByAccountIdAndSemester(studentId, semester, pageable);
+
+        List<EnrolledCoursesDto> content = enrollmentSlice.getContent().stream()
+                .map(EnrolledCoursesDto::from)
+                .toList();
+
+        return SliceResponse.of(content, page, 12, enrollmentSlice.hasNext());
     }
 }
