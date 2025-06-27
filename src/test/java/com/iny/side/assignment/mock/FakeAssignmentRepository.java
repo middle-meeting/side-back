@@ -2,6 +2,9 @@ package com.iny.side.assignment.mock;
 
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,5 +61,21 @@ public class FakeAssignmentRepository implements AssignmentRepository {
                 .filter(assignment -> assignment.getCourse() != null &&
                         Objects.equals(assignment.getCourse().getId(), courseId))
                 .toList();
+    }
+
+    @Override
+    public Slice<Assignment> findAllByCourseId(Long courseId, Pageable pageable) {
+        List<Assignment> filtered = data.stream()
+                .filter(assignment -> assignment.getCourse() != null &&
+                        Objects.equals(assignment.getCourse().getId(), courseId))
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+
+        List<Assignment> content = start < filtered.size() ? filtered.subList(start, end) : new ArrayList<>();
+        boolean hasNext = end < filtered.size();
+
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 }

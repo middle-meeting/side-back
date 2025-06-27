@@ -4,11 +4,15 @@ import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.repository.EnrollmentRepository;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +31,19 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
         return assignmentRepository.findAllByCourseId(courseId).stream()
                 .map(AssignmentSimpleResponseDto::from)
                 .toList();
+    }
+
+    @Override
+    public SliceResponse<AssignmentSimpleResponseDto> getAll(Long courseId, Long studentId, int page) {
+        validateStudentEnrolledCourse(courseId, studentId);
+        Pageable pageable = PageRequest.of(page, 12);
+        Slice<Assignment> assignmentSlice = assignmentRepository.findAllByCourseId(courseId, pageable);
+
+        List<AssignmentSimpleResponseDto> content = assignmentSlice.getContent().stream()
+                .map(AssignmentSimpleResponseDto::from)
+                .toList();
+
+        return SliceResponse.of(content, page, 12, assignmentSlice.hasNext());
     }
 
     @Override

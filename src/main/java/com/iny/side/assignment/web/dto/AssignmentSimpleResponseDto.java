@@ -4,12 +4,14 @@ import com.iny.side.assignment.domain.entity.Assignment;
 
 import java.time.LocalDateTime;
 
-public record AssignmentSimpleResponseDto(Long id, String title, LocalDateTime dueDate, String creatorName) {
+public record AssignmentSimpleResponseDto(Long id, String title, LocalDateTime dueDate, String objective,
+                                          String creatorName) {
     public static AssignmentSimpleResponseDto from(Assignment assignment) {
         return new AssignmentSimpleResponseDto(
                 assignment.getId(),
                 assignment.getTitle(),
                 assignment.getDueDate(),
+                assignment.getObjective(),
                 assignment.getCourse().getAccount().getName()
         );
     }

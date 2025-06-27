@@ -3,6 +3,8 @@ package com.iny.side.assignment.infrastructure.repository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +19,11 @@ public class AssignmentRepositoryImpl implements AssignmentRepository {
     @Override
     public List<Assignment> findAllByCourseId(Long courseId) {
         return assignmentJpaRepository.findAllByCourseId(courseId);
+    }
+
+    @Override
+    public Slice<Assignment> findAllByCourseId(Long courseId, Pageable pageable) {
+        return assignmentJpaRepository.findAllByCourseId(courseId, pageable);
     }
 
     @Override

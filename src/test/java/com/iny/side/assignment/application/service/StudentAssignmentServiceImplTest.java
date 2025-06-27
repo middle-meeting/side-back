@@ -6,6 +6,7 @@ import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.course.domain.entity.Course;
@@ -129,6 +130,23 @@ class StudentAssignmentServiceImplTest {
         assertThatThrownBy(() ->
                 studentAssignmentService.getAll(999999L, student.getId())
         ).isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void 학생이_수강하는_강의의_과제_페이징_정상조회() {
+        // when
+        SliceResponse<AssignmentSimpleResponseDto> result = studentAssignmentService.getAll(testCourse.getId(), student.getId(), 0);
+
+        // then
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getPage()).isEqualTo(0);
+        assertThat(result.getSize()).isEqualTo(12);
+        assertThat(result.isHasNext()).isFalse();
+        assertThat(result.isFirst()).isTrue();
+        assertThat(result.isLast()).isTrue();
+        assertThat(result.getContent())
+                .extracting(AssignmentSimpleResponseDto::title)
+                .containsExactlyInAnyOrder("심장질환 케이스", "상세보기용 과제");
     }
 
     @Test
