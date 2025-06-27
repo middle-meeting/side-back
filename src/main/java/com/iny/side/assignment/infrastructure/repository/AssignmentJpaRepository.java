@@ -14,6 +14,5 @@ public interface AssignmentJpaRepository extends JpaRepository<Assignment, Long>
     @Query("SELECT a FROM Assignment a JOIN FETCH a.course c JOIN FETCH c.account where a.course.id = :courseId")
     List<Assignment> findAllByCourseId(@Param("courseId") Long courseId);
 
-    @Query("SELECT a FROM Assignment a JOIN FETCH a.course c JOIN FETCH c.account where a.course.id = :courseId")
     Slice<Assignment> findAllByCourseId(@Param("courseId") Long courseId, Pageable pageable);
 }
