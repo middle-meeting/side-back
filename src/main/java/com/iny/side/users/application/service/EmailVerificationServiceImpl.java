@@ -1,8 +1,10 @@
 package com.iny.side.users.application.service;
 
+import com.iny.side.common.exception.DuplicateUsernameException;
 import com.iny.side.users.domain.entity.EmailVerification;
 import com.iny.side.users.domain.event.EmailVerificationRequestedEvent;
 import com.iny.side.users.domain.repository.EmailVerificationRepository;
+import com.iny.side.users.domain.repository.UserRepository;
 import com.iny.side.users.web.dto.EmailVerificationConfirmDto;
 import com.iny.side.users.web.dto.EmailVerificationRequestDto;
 import jakarta.transaction.Transactional;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     private final EmailVerificationRepository emailVerificationRepository;
+    private final UserRepository userRepository;
     private final VerificationCodeGenerator verificationCodeGenerator;
     private final EmailNotificationService emailNotificationService;
     private static final int EXPIRATION_MINUTES = 3;
@@ -27,6 +30,11 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     @Transactional
     public void sendVerificationCode(EmailVerificationRequestDto requestDto) {
         String email = requestDto.email();
+
+        // 이미 가입된 이메일인지 검증
+        if (userRepository.existsByUsername(email)) {
+            throw new DuplicateUsernameException(email);
+        }
 
         // 기존 인증 코드 삭제
         emailVerificationRepository.deleteByEmail(email);

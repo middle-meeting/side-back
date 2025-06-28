@@ -1,18 +1,21 @@
 package com.iny.side.users.web.controller;
 
 
+import com.iny.side.common.BasicResponse;
 import com.iny.side.users.application.service.EmailVerificationService;
 import com.iny.side.users.application.service.UserService;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import com.iny.side.users.web.dto.EmailVerificationConfirmDto;
+import com.iny.side.users.web.dto.EmailVerificationConfirmResponseDto;
 import com.iny.side.users.web.dto.EmailVerificationRequestDto;
+import com.iny.side.users.web.dto.EmailVerificationResponseDto;
 import com.iny.side.users.web.dto.SignupDto;
+import com.iny.side.users.web.dto.SignupResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -38,31 +41,33 @@ public class RestApiController {
     }
 
     @PostMapping("/signup")
-    public SignupDto signup(@RequestBody @Valid SignupDto signupDto) {
-        return SignupDto.from(userService.signup(signupDto));
+    public ResponseEntity<BasicResponse<SignupResponseDto>> signup(@RequestBody @Valid SignupDto signupDto) {
+        SignupResponseDto response = SignupResponseDto.from(userService.signup(signupDto));
+        return ResponseEntity.ok(BasicResponse.ok(response));
     }
 
-    @GetMapping("/signup/check-username")
-    public Map<String, Boolean> checkUsername(@RequestParam(value = "username") String username) {
-        return Map.of("exists", userService.existsByUsername(username));
-    }
 
     @PostMapping("/signup/send-verification")
-    public Map<String, String> sendVerificationCode(@RequestBody @Valid EmailVerificationRequestDto requestDto) {
+    public ResponseEntity<BasicResponse<EmailVerificationResponseDto>> sendVerificationCode(@RequestBody @Valid EmailVerificationRequestDto requestDto) {
         emailVerificationService.sendVerificationCode(requestDto);
-        return Map.of("message", "인증번호가 전송되었습니다.");
+        EmailVerificationResponseDto response = EmailVerificationResponseDto.success();
+        return ResponseEntity.ok(BasicResponse.ok(response));
     }
 
     @PostMapping("/signup/verify-email")
-    public Map<String, Boolean> verifyEmail(@RequestBody @Valid EmailVerificationConfirmDto confirmDto) {
+    public ResponseEntity<BasicResponse<EmailVerificationConfirmResponseDto>> verifyEmail(@RequestBody @Valid EmailVerificationConfirmDto confirmDto) {
         boolean verified = emailVerificationService.verifyCode(confirmDto);
-        return Map.of("verified", verified);
+        EmailVerificationConfirmResponseDto response = verified
+            ? EmailVerificationConfirmResponseDto.success()
+            : EmailVerificationConfirmResponseDto.failure();
+        return ResponseEntity.ok(BasicResponse.ok(response));
     }
 
     @PostMapping("/signup/resend-verification")
-    public Map<String, String> resendVerificationCode(@RequestBody @Valid EmailVerificationRequestDto requestDto) {
+    public ResponseEntity<BasicResponse<EmailVerificationResponseDto>> resendVerificationCode(@RequestBody @Valid EmailVerificationRequestDto requestDto) {
         emailVerificationService.resendVerificationCode(requestDto);
-        return Map.of("message", "인증번호가 재전송되었습니다.");
+        EmailVerificationResponseDto response = EmailVerificationResponseDto.resendSuccess();
+        return ResponseEntity.ok(BasicResponse.ok(response));
     }
 
 }

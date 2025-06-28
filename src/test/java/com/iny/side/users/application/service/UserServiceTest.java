@@ -37,6 +37,7 @@ class UserServiceTest {
         fakeEmailNotificationService = new FakeEmailNotificationService(fakeEmailSender);
         emailVerificationService = new EmailVerificationServiceImpl(
                 fakeEmailVerificationRepository,
+                fakeUserRepository,
                 fakeVerificationCodeGenerator,
                 fakeEmailNotificationService
         );

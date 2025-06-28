@@ -1,6 +1,9 @@
 package com.iny.side.users.application.service;
 
+import com.iny.side.common.exception.DuplicateUsernameException;
+import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.mock.FakeEmailVerificationRepository;
+import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.users.mock.FakeVerificationCodeGenerator;
 import com.iny.side.users.mock.FakeEmailSender;
 import com.iny.side.users.mock.FakeEmailNotificationService;
@@ -19,6 +22,7 @@ class EmailVerificationServiceTest {
 
     private EmailVerificationService emailVerificationService;
     private FakeEmailVerificationRepository fakeEmailVerificationRepository;
+    private FakeUserRepository fakeUserRepository;
     private FakeVerificationCodeGenerator fakeVerificationCodeGenerator;
     private FakeEmailSender fakeEmailSender;
     private FakeEmailNotificationService fakeEmailNotificationService;
@@ -26,11 +30,13 @@ class EmailVerificationServiceTest {
     @BeforeEach
     void setUp() {
         fakeEmailVerificationRepository = new FakeEmailVerificationRepository();
+        fakeUserRepository = new FakeUserRepository();
         fakeVerificationCodeGenerator = new FakeVerificationCodeGenerator();
         fakeEmailSender = new FakeEmailSender();
         fakeEmailNotificationService = new FakeEmailNotificationService(fakeEmailSender);
         emailVerificationService = new EmailVerificationServiceImpl(
                 fakeEmailVerificationRepository,
+                fakeUserRepository,
                 fakeVerificationCodeGenerator,
                 fakeEmailNotificationService
         );
@@ -281,5 +287,34 @@ class EmailVerificationServiceTest {
         assertThat(fakeEmailSender.wasEmailSentTo(email)).isTrue();
         assertThat(fakeEmailSender.getLastVerificationCodeSentTo(email)).isEqualTo(expectedCode);
         assertThat(fakeEmailNotificationService.getEventCount()).isEqualTo(1);
+    }
+
+    @Test
+    void 이미_가입된_이메일로_인증번호_요청시_예외_발생() {
+        // given
+        String email = "existing@test.com";
+
+        // 기존 사용자 생성
+        fakeUserRepository.save(createTestAccount(email));
+
+        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+
+        // when & then
+        assertThatThrownBy(() -> emailVerificationService.sendVerificationCode(requestDto))
+                .isInstanceOf(DuplicateUsernameException.class);
+    }
+
+    private Account createTestAccount(String email) {
+        return Account.builder()
+                .username(email)
+                .password("password")
+                .name("테스트")
+                .role(com.iny.side.users.domain.Role.STUDENT)
+                .school("테스트대학교")
+                .major("컴퓨터공학과")
+                .grade(1)
+                .studentId("20211234")
+                .emailVerified(true)
+                .build();
     }
 }

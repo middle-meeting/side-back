@@ -138,33 +138,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             // 이메일 input 이 바뀌면 안내 메시지 초기화
             document.getElementById('username').addEventListener('input', function () {
-                document.getElementById('username-available').innerText = '';
                 document.getElementById('error-username').innerText = '';
             });
-
-            // 중복확인 버튼
-            document.getElementById('check-username-btn').onclick = function () {
-                const username = document.getElementById('username').value;
-                if (!username) {
-                    document.getElementById('error-username').innerText = "이메일을 입력하세요.";
-                    return;
-                }
-                document.getElementById('error-username').innerText = '';
-                document.getElementById('username-available').innerText = '';
-
-                fetch('/api/signup/check-username?username=' + encodeURIComponent(username))
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.exists) {
-                            document.getElementById('error-username').innerText = "이미 가입된 이메일입니다.";
-                        } else {
-                            document.getElementById('username-available').innerText = "사용 가능한 이메일입니다.";
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error during check-username:', error);
-                    });
-            };
         });
     </script>
 </head>
@@ -180,15 +155,8 @@
                 <h2>Sign Up</h2>
                 <div class="form-group">
                     <label for="username">이메일</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="username" name="username" required>
-                        <div class="input-group-append">
-                            <button type="button" class="btn btn-outline-secondary" id="check-username-btn">중복확인
-                            </button>
-                        </div>
-                    </div>
+                    <input type="text" class="form-control" id="username" name="username" required>
                     <div id="error-username" class="text-danger"></div>
-                    <div id="username-available" class="text-success"></div>
                 </div>
                 <div class="form-group">
                     <label for="password">비밀번호</label>
