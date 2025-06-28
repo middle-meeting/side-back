@@ -8,8 +8,8 @@ import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
+import com.iny.side.course.application.service.EnrollmentValidationService;
 import com.iny.side.course.domain.entity.Course;
-import com.iny.side.course.domain.repository.CourseRepository;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,11 @@ import java.util.List;
 public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentService {
 
     private final AssignmentRepository assignmentRepository;
-    private final CourseRepository courseRepository;
+    private final EnrollmentValidationService enrollmentValidationService;
 
     @Override
     public List<AssignmentSimpleResponseDto> getAll(Long courseId, Long professorId) {
-        validateProfessorOwnsCourse(courseId, professorId);
+        enrollmentValidationService.validateProfessorOwnsCourse(courseId, professorId);
         return assignmentRepository.findAllByCourseId(courseId).stream()
                 .map(AssignmentSimpleResponseDto::from)
                 .toList();
@@ -36,14 +36,14 @@ public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentServic
     @Override
     @Transactional
     public AssignmentSimpleResponseDto create(Long courseId, Long professorId, AssignmentCreateDto dto) {
-        Course course = validateProfessorOwnsCourse(courseId, professorId);
+        Course course = enrollmentValidationService.validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = Assignment.create(course, AssignmentInfo.from(dto));
         return AssignmentSimpleResponseDto.from(assignmentRepository.save(assignment));
     }
 
     @Override
     public ProfessorAssignmentDetailResponseDto get(Long courseId, Long professorId, Long assignmentId) {
-        validateProfessorOwnsCourse(courseId, professorId);
+        enrollmentValidationService.validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment"));
         validateAssignmentBelongsToCourse(courseId, assignment);
@@ -54,7 +54,7 @@ public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentServic
     @Override
     @Transactional
     public void delete(Long courseId, Long professorId, Long assignmentId) {
-        validateProfessorOwnsCourse(courseId, professorId);
+        enrollmentValidationService.validateProfessorOwnsCourse(courseId, professorId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment"));
         validateAssignmentBelongsToCourse(courseId, assignment);
@@ -67,10 +67,5 @@ public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentServic
         }
     }
 
-    private Course validateProfessorOwnsCourse(Long courseId, Long professorId) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course"));
-        course.validateOwner(professorId);
-        return course;
-    }
+
 }

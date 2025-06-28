@@ -14,6 +14,7 @@ import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.domain.repository.CourseRepository;
 import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.course.mock.FakeEnrollmentRepository;
+import com.iny.side.course.mock.FakeEnrollmentValidationService;
 import com.iny.side.users.domain.entity.Account;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,9 +42,10 @@ class StudentAssignmentServiceImplTest {
         FakeAssignmentRepository fakeAssignmentRepository = new FakeAssignmentRepository();
         FakeUserRepository fakeUserRepository = new FakeUserRepository();
         FakeCourseRepository fakeCourseRepository = new FakeCourseRepository();
+        FakeEnrollmentValidationService fakeEnrollmentValidationService = new FakeEnrollmentValidationService(fakeEnrollmentRepository, fakeCourseRepository);
 
         studentAssignmentService = StudentAssignmentServiceImpl.builder()
-                .enrollmentRepository(fakeEnrollmentRepository)
+                .enrollmentValidationService(fakeEnrollmentValidationService)
                 .assignmentRepository(fakeAssignmentRepository)
                 .build();
 

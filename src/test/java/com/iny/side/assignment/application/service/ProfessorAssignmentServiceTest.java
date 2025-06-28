@@ -11,6 +11,7 @@ import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.mock.FakeCourseRepository;
+import com.iny.side.course.mock.FakeEnrollmentValidationService;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,9 +41,11 @@ class ProfessorAssignmentServiceTest {
         fakeCourseRepository = new FakeCourseRepository();
         fakeUserRepository = new FakeUserRepository();
 
+        FakeEnrollmentValidationService fakeEnrollmentValidationService = new FakeEnrollmentValidationService(null, fakeCourseRepository);
+
         professorAssignmentService = ProfessorAssignmentServiceImpl.builder()
                 .assignmentRepository(fakeAssignmentRepository)
-                .courseRepository(fakeCourseRepository)
+                .enrollmentValidationService(fakeEnrollmentValidationService)
                 .build();
 
         // 교수 1, 2 생성

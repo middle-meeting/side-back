@@ -7,7 +7,7 @@ import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
 import com.iny.side.common.SliceResponse;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
-import com.iny.side.course.domain.repository.EnrollmentRepository;
+import com.iny.side.course.application.service.EnrollmentValidationService;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +22,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentAssignmentServiceImpl implements StudentAssignmentService {
 
-    private final EnrollmentRepository enrollmentRepository;
+    private final EnrollmentValidationService enrollmentValidationService;
     private final AssignmentRepository assignmentRepository;
 
     @Override
     public List<AssignmentSimpleResponseDto> getAll(Long courseId, Long studentId) {
-        validateStudentEnrolledCourse(courseId, studentId);
+        enrollmentValidationService.validateStudentEnrolledInCourse(courseId, studentId);
         return assignmentRepository.findAllByCourseId(courseId).stream()
                 .map(AssignmentSimpleResponseDto::from)
                 .toList();
@@ -35,7 +35,7 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
 
     @Override
     public SliceResponse<AssignmentSimpleResponseDto> getAll(Long courseId, Long studentId, int page) {
-        validateStudentEnrolledCourse(courseId, studentId);
+        enrollmentValidationService.validateStudentEnrolledInCourse(courseId, studentId);
         Pageable pageable = PageRequest.of(page, 12);
         Slice<Assignment> assignmentSlice = assignmentRepository.findAllByCourseId(courseId, pageable);
 
@@ -48,17 +48,14 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
 
     @Override
     public StudentAssignmentDetailResponseDto get(Long courseId, Long studentId, Long assignmentId) {
-        validateStudentEnrolledCourse(courseId, studentId);
+        enrollmentValidationService.validateStudentEnrolledInCourse(courseId, studentId);
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("Assignment"));
         validateAssignmentBelongsToCourse(courseId, assignment);
         return StudentAssignmentDetailResponseDto.from(assignment);
     }
 
-    private void validateStudentEnrolledCourse(Long courseId, Long studentId) {
-        enrollmentRepository.findByCourseIdAndStudentId(courseId, studentId)
-                .orElseThrow(() -> new ForbiddenException("forbidden.not_enrolled"));
-    }
+
 
     private static void validateAssignmentBelongsToCourse(Long courseId, Assignment assignment) {
         if (!assignment.getCourse().getId().equals(courseId)) {
