@@ -5,15 +5,14 @@ import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.chat.domain.entity.ChatMessage;
 import com.iny.side.chat.domain.repository.ChatMessageRepository;
 import com.iny.side.chat.exception.AiResponseGenerationException;
-import com.iny.side.chat.infrastructure.external.AiClient;
+import com.iny.side.chat.application.port.AiClient;
 import com.iny.side.chat.infrastructure.external.dto.AiChatRequestDto;
 import com.iny.side.chat.infrastructure.external.dto.AiChatResponseDto;
 import com.iny.side.chat.web.dto.ChatMessageResponseDto;
 import com.iny.side.chat.web.dto.ChatResponseDto;
-import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.common.result.Result;
-import com.iny.side.course.domain.repository.EnrollmentRepository;
+import com.iny.side.course.application.service.EnrollmentValidationService;
 import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.domain.repository.SubmissionRepository;
 import com.iny.side.users.domain.entity.Account;
@@ -35,7 +34,7 @@ public class ChatServiceImpl implements ChatService {
     private final SubmissionRepository submissionRepository;
     private final AssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
-    private final EnrollmentRepository enrollmentRepository;
+    private final EnrollmentValidationService enrollmentValidationService;
     private final AiClient aiClient;
     
     @Override
@@ -50,7 +49,7 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new NotFoundException("과제"));
 
         // 3. 학생이 해당 과제의 수강생인지 검증
-        validateStudentEnrolledInCourse(assignment.getCourse().getId(), studentId);
+        enrollmentValidationService.validateStudentEnrolledInCourse(assignment.getCourse().getId(), studentId);
 
         // 4. Submission 조회 또는 생성
         Submission submission = submissionRepository.findByStudentIdAndAssignmentId(studentId, assignmentId)
@@ -115,10 +114,7 @@ public class ChatServiceImpl implements ChatService {
         return chatMessageRepository.save(aiMessage);
     }
     
-    private void validateStudentEnrolledInCourse(Long courseId, Long studentId) {
-        enrollmentRepository.findByCourseIdAndStudentId(courseId, studentId)
-                .orElseThrow(() -> new ForbiddenException("forbidden.not_enrolled"));
-    }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -128,7 +124,7 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new NotFoundException("과제"));
 
         // 2. 학생이 해당 과제의 수강생인지 검증
-        validateStudentEnrolledInCourse(assignment.getCourse().getId(), studentId);
+        enrollmentValidationService.validateStudentEnrolledInCourse(assignment.getCourse().getId(), studentId);
 
         // 3. Submission 조회
         Submission submission = submissionRepository.findByStudentIdAndAssignmentId(studentId, assignmentId)

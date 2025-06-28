@@ -1,4 +1,4 @@
-package com.iny.side.chat.infrastructure.external;
+package com.iny.side.chat.application.port;
 
 import com.iny.side.chat.infrastructure.external.dto.AiChatRequestDto;
 import com.iny.side.chat.infrastructure.external.dto.AiChatResponseDto;

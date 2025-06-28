@@ -1,6 +1,6 @@
 package com.iny.side.chat.mock;
 
-import com.iny.side.chat.infrastructure.external.AiClient;
+import com.iny.side.chat.application.port.AiClient;
 import com.iny.side.chat.infrastructure.external.dto.AiChatRequestDto;
 import com.iny.side.chat.infrastructure.external.dto.AiChatResponseDto;
 import com.iny.side.common.result.Result;

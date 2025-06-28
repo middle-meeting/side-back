@@ -15,6 +15,8 @@ import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.mock.FakeEnrollmentRepository;
+import com.iny.side.course.mock.FakeEnrollmentValidationService;
+import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.mock.FakeSubmissionRepository;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
@@ -36,6 +38,7 @@ class ChatServiceImplTest {
     private FakeAssignmentRepository assignmentRepository;
     private FakeUserRepository userRepository;
     private FakeEnrollmentRepository enrollmentRepository;
+    private FakeEnrollmentValidationService enrollmentValidationService;
     private FakeAiClient aiClient;
     
     @BeforeEach
@@ -45,6 +48,7 @@ class ChatServiceImplTest {
         assignmentRepository = new FakeAssignmentRepository();
         userRepository = new FakeUserRepository();
         enrollmentRepository = new FakeEnrollmentRepository();
+        enrollmentValidationService = new FakeEnrollmentValidationService(enrollmentRepository, null);
         aiClient = new FakeAiClient();
 
         chatService = new ChatServiceImpl(
@@ -52,7 +56,7 @@ class ChatServiceImplTest {
                 submissionRepository,
                 assignmentRepository,
                 userRepository,
-                enrollmentRepository,
+                enrollmentValidationService,
                 aiClient
         );
     }
@@ -224,5 +228,83 @@ class ChatServiceImplTest {
         // when & then
         assertThatThrownBy(() -> chatService.getMessages(student.getId(), assignment.getId()))
                 .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void 첫_채팅_시_Submission_자동_생성() {
+        // given
+        Account student = TestFixtures.createStudent();
+        userRepository.save(student);
+
+        Course course = TestFixtures.createCourse();
+        Assignment assignment = TestFixtures.createAssignment(course);
+        assignmentRepository.save(assignment);
+
+        // 수강 등록
+        Enrollment enrollment = TestFixtures.createEnrollment(course, student);
+        enrollmentRepository.save(enrollment);
+
+        String message = "안녕하세요, 어떤 증상이 있으신가요?";
+
+        // Submission이 없는 상태에서 시작
+        assertThat(submissionRepository.findByStudentIdAndAssignmentId(student.getId(), assignment.getId()))
+                .isEmpty();
+
+        // when
+        ChatResponseDto response = chatService.sendMessage(student.getId(), assignment.getId(), message);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.studentMessage().message()).isEqualTo(message);
+        assertThat(response.aiMessage()).isNotNull();
+
+        // Submission이 자동으로 생성되었는지 확인
+        assertThat(submissionRepository.findByStudentIdAndAssignmentId(student.getId(), assignment.getId()))
+                .isPresent()
+                .get()
+                .satisfies(submission -> {
+                    assertThat(submission.getStudent().getId()).isEqualTo(student.getId());
+                    assertThat(submission.getAssignment().getId()).isEqualTo(assignment.getId());
+                    assertThat(submission.getStatus()).isEqualTo(Submission.SubmissionStatus.DRAFT);
+                    assertThat(submission.getPrimaryDiagnosis()).isNull(); // 아직 제출 전
+                    assertThat(submission.getFinalJudgment()).isNull(); // 아직 제출 전
+                });
+    }
+
+    @Test
+    void 이미_Submission이_있으면_새로_생성하지_않음() {
+        // given
+        Account student = TestFixtures.createStudent();
+        userRepository.save(student);
+
+        Course course = TestFixtures.createCourse();
+        Assignment assignment = TestFixtures.createAssignment(course);
+        assignmentRepository.save(assignment);
+
+        // 수강 등록
+        Enrollment enrollment = TestFixtures.createEnrollment(course, student);
+        enrollmentRepository.save(enrollment);
+
+        // 기존 Submission 생성
+        Submission existingSubmission = TestFixtures.createSubmission(student, assignment);
+        submissionRepository.save(existingSubmission);
+        Long originalSubmissionId = existingSubmission.getId();
+
+        String message = "추가 질문이 있습니다.";
+
+        // when
+        ChatResponseDto response = chatService.sendMessage(student.getId(), assignment.getId(), message);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.studentMessage().message()).isEqualTo(message);
+
+        // 기존 Submission을 재사용했는지 확인 (새로 생성하지 않음)
+        assertThat(submissionRepository.findByStudentIdAndAssignmentId(student.getId(), assignment.getId()))
+                .isPresent()
+                .get()
+                .satisfies(submission -> {
+                    assertThat(submission.getId()).isEqualTo(originalSubmissionId);
+                });
     }
 }

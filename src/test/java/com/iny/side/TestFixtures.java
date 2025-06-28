@@ -4,6 +4,7 @@ import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
+import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
 
@@ -84,6 +85,14 @@ public class TestFixtures {
                 .id(1L)
                 .course(course)
                 .account(student)
+                .build();
+    }
+
+    public static Submission createSubmission(Account student, Assignment assignment) {
+        return Submission.builder()
+                .id(1L)
+                .student(student)
+                .assignment(assignment)
                 .build();
     }
 }
