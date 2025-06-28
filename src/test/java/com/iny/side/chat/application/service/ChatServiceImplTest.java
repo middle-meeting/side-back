@@ -7,6 +7,7 @@ import com.iny.side.chat.exception.AiResponseGenerationException;
 import com.iny.side.chat.mock.FakeAiClient;
 import com.iny.side.chat.mock.FakeChatMessageRepository;
 import com.iny.side.chat.web.dto.ChatMessageRequestDto;
+import com.iny.side.chat.web.dto.ChatMessageResponseDto;
 import com.iny.side.chat.web.dto.ChatResponseDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -152,5 +154,75 @@ class ChatServiceImplTest {
         // when & then
         assertThatThrownBy(() -> chatService.sendMessage(student.getId(), assignment.getId(), message))
                 .isInstanceOf(AiResponseGenerationException.class);
+    }
+
+    @Test
+    void 채팅_메시지_조회_성공() {
+        // given
+        Account student = TestFixtures.createStudent();
+        userRepository.save(student);
+
+        Course course = TestFixtures.createCourse();
+        Assignment assignment = TestFixtures.createAssignment(course);
+        assignmentRepository.save(assignment);
+
+        // 수강 등록
+        Enrollment enrollment = TestFixtures.createEnrollment(course, student);
+        enrollmentRepository.save(enrollment);
+
+        // 채팅 메시지 전송하여 데이터 생성
+        String message1 = "안녕하세요, 어떤 증상이 있으신가요?";
+        String message2 = "추가 질문이 있습니다.";
+
+        chatService.sendMessage(student.getId(), assignment.getId(), message1);
+        chatService.sendMessage(student.getId(), assignment.getId(), message2);
+
+        // when
+        List<ChatMessageResponseDto> messages = chatService.getMessages(student.getId(), assignment.getId());
+
+        // then
+        assertThat(messages).hasSize(4); // 학생 메시지 2개 + AI 응답 2개
+        assertThat(messages.get(0).speaker()).isEqualTo("STUDENT");
+        assertThat(messages.get(0).message()).isEqualTo(message1);
+        assertThat(messages.get(1).speaker()).isEqualTo("AI");
+        assertThat(messages.get(2).speaker()).isEqualTo("STUDENT");
+        assertThat(messages.get(2).message()).isEqualTo(message2);
+        assertThat(messages.get(3).speaker()).isEqualTo("AI");
+    }
+
+    @Test
+    void 채팅_메시지_조회_Submission이_없으면_예외_발생() {
+        // given
+        Account student = TestFixtures.createStudent();
+        userRepository.save(student);
+
+        Course course = TestFixtures.createCourse();
+        Assignment assignment = TestFixtures.createAssignment(course);
+        assignmentRepository.save(assignment);
+
+        // 수강 등록
+        Enrollment enrollment = TestFixtures.createEnrollment(course, student);
+        enrollmentRepository.save(enrollment);
+
+        // when & then
+        assertThatThrownBy(() -> chatService.getMessages(student.getId(), assignment.getId()))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void 채팅_메시지_조회_수강하지_않은_과제는_접근_불가() {
+        // given
+        Account student = TestFixtures.createStudent();
+        userRepository.save(student);
+
+        Course course = TestFixtures.createCourse();
+        Assignment assignment = TestFixtures.createAssignment(course);
+        assignmentRepository.save(assignment);
+
+        // 수강 등록하지 않음
+
+        // when & then
+        assertThatThrownBy(() -> chatService.getMessages(student.getId(), assignment.getId()))
+                .isInstanceOf(ForbiddenException.class);
     }
 }

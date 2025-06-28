@@ -18,12 +18,13 @@ import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.domain.repository.SubmissionRepository;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.domain.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -117,6 +118,27 @@ public class ChatServiceImpl implements ChatService {
     private void validateStudentEnrolledInCourse(Long courseId, Long studentId) {
         enrollmentRepository.findByCourseIdAndStudentId(courseId, studentId)
                 .orElseThrow(() -> new ForbiddenException("forbidden.not_enrolled"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ChatMessageResponseDto> getMessages(Long studentId, Long assignmentId) {
+        // 1. 과제 조회
+        Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
+                .orElseThrow(() -> new NotFoundException("과제"));
+
+        // 2. 학생이 해당 과제의 수강생인지 검증
+        validateStudentEnrolledInCourse(assignment.getCourse().getId(), studentId);
+
+        // 3. Submission 조회
+        Submission submission = submissionRepository.findByStudentIdAndAssignmentId(studentId, assignmentId)
+                .orElseThrow(() -> new NotFoundException("과제 수행 기록"));
+
+        // 4. 채팅 메시지들을 턴 번호 순으로 조회하여 DTO로 변환
+        List<ChatMessage> chatMessages = chatMessageRepository.findBySubmissionIdOrderByTurnNumber(submission.getId());
+        return chatMessages.stream()
+                .map(ChatMessageResponseDto::from)
+                .toList();
     }
 
     private String createPatientContext(Assignment assignment) {
