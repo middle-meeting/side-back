@@ -22,6 +22,13 @@ public class FakeUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<Account> findById(Long id) {
+        return data.stream()
+                .filter(account -> Objects.equals(account.getId(), id))
+                .findFirst();
+    }
+
+    @Override
     public Boolean existsByUsername(String username) {
         return data.stream()
                 .anyMatch(account -> Objects.equals(account.getUsername(), username));
