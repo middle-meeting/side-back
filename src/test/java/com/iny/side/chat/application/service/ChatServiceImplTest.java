@@ -69,19 +69,16 @@ class ChatServiceImplTest {
         Enrollment enrollment = TestFixtures.createEnrollment(course, student);
         enrollmentRepository.save(enrollment);
 
-        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(
-                assignment.getId(),
-                "안녕하세요, 어떤 증상이 있으신가요?"
-        );
+        String message = "안녕하세요, 어떤 증상이 있으신가요?";
 
         // when
-        ChatResponseDto response = chatService.sendMessage(student.getId(), requestDto);
+        ChatResponseDto response = chatService.sendMessage(student.getId(), assignment.getId(), message);
 
         // then
         assertThat(response).isNotNull();
         assertThat(response.studentMessage()).isNotNull();
         assertThat(response.aiMessage()).isNotNull();
-        assertThat(response.studentMessage().message()).isEqualTo("안녕하세요, 어떤 증상이 있으신가요?");
+        assertThat(response.studentMessage().message()).isEqualTo(message);
         assertThat(response.studentMessage().speaker()).isEqualTo("STUDENT");
         assertThat(response.aiMessage().speaker()).isEqualTo("AI");
         assertThat(response.studentMessage().turnNumber()).isEqualTo(1);
@@ -100,13 +97,10 @@ class ChatServiceImplTest {
 
         // 수강 등록하지 않음
 
-        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(
-                assignment.getId(),
-                "안녕하세요"
-        );
+        String message = "안녕하세요";
 
         // when & then
-        assertThatThrownBy(() -> chatService.sendMessage(student.getId(), requestDto))
+        assertThatThrownBy(() -> chatService.sendMessage(student.getId(), assignment.getId(), message))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -117,13 +111,10 @@ class ChatServiceImplTest {
         Assignment assignment = TestFixtures.createAssignment(course);
         assignmentRepository.save(assignment);
 
-        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(
-                assignment.getId(),
-                "안녕하세요"
-        );
+        String message = "안녕하세요";
 
         // when & then
-        assertThatThrownBy(() -> chatService.sendMessage(999L, requestDto))
+        assertThatThrownBy(() -> chatService.sendMessage(999L, assignment.getId(), message))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -133,13 +124,10 @@ class ChatServiceImplTest {
         Account student = TestFixtures.createStudent();
         userRepository.save(student);
 
-        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(
-                999L,
-                "안녕하세요"
-        );
+        String message = "안녕하세요";
 
         // when & then
-        assertThatThrownBy(() -> chatService.sendMessage(student.getId(), requestDto))
+        assertThatThrownBy(() -> chatService.sendMessage(student.getId(), 999L, message))
                 .isInstanceOf(NotFoundException.class);
     }
     
@@ -159,13 +147,10 @@ class ChatServiceImplTest {
 
         aiClient.setShouldFail(true);
 
-        ChatMessageRequestDto requestDto = new ChatMessageRequestDto(
-                assignment.getId(),
-                "안녕하세요"
-        );
+        String message = "안녕하세요";
 
         // when & then
-        assertThatThrownBy(() -> chatService.sendMessage(student.getId(), requestDto))
+        assertThatThrownBy(() -> chatService.sendMessage(student.getId(), assignment.getId(), message))
                 .isInstanceOf(AiResponseGenerationException.class);
     }
 }

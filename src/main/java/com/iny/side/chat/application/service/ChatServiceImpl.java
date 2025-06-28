@@ -8,7 +8,6 @@ import com.iny.side.chat.exception.AiResponseGenerationException;
 import com.iny.side.chat.infrastructure.external.AiClient;
 import com.iny.side.chat.infrastructure.external.dto.AiChatRequestDto;
 import com.iny.side.chat.infrastructure.external.dto.AiChatResponseDto;
-import com.iny.side.chat.web.dto.ChatMessageRequestDto;
 import com.iny.side.chat.web.dto.ChatMessageResponseDto;
 import com.iny.side.chat.web.dto.ChatResponseDto;
 import com.iny.side.common.exception.ForbiddenException;
@@ -40,33 +39,33 @@ public class ChatServiceImpl implements ChatService {
     
     @Override
     @Transactional
-    public ChatResponseDto sendMessage(Long studentId, ChatMessageRequestDto requestDto) {
+    public ChatResponseDto sendMessage(Long studentId, Long assignmentId, String message) {
         // 1. 학생 조회
         Account student = userRepository.findById(studentId)
                 .orElseThrow(() -> new NotFoundException("학생"));
-        
+
         // 2. 과제 조회
-        Assignment assignment = assignmentRepository.findByAssignmentId(requestDto.assignmentId())
+        Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("과제"));
 
         // 3. 학생이 해당 과제의 수강생인지 검증
         validateStudentEnrolledInCourse(assignment.getCourse().getId(), studentId);
 
         // 4. Submission 조회 또는 생성
-        Submission submission = submissionRepository.findByStudentIdAndAssignmentId(studentId, requestDto.assignmentId())
+        Submission submission = submissionRepository.findByStudentIdAndAssignmentId(studentId, assignmentId)
                 .orElseGet(() -> createNewSubmission(student, assignment));
 
         // 5. 현재 턴 번호 계산
         Integer currentTurnNumber = chatMessageRepository.findMaxTurnNumberBySubmissionId(submission.getId()) + 1;
 
         // 6. 학생 메시지 저장
-        ChatMessage studentMessage = saveStudentMessage(submission, currentTurnNumber, requestDto.message());
+        ChatMessage studentMessage = saveStudentMessage(submission, currentTurnNumber, message);
 
         // 7. 환자 컨텍스트 생성
         String patientContext = createPatientContext(assignment);
 
         // 8. AI 서버 호출
-        AiChatRequestDto aiRequest = AiChatRequestDto.of(requestDto.message(), patientContext);
+        AiChatRequestDto aiRequest = AiChatRequestDto.of(message, patientContext);
         Result<AiChatResponseDto> aiResponseResult = aiClient.sendChatMessage(aiRequest);
         
         if (aiResponseResult.isFailure()) {

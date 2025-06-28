@@ -9,24 +9,22 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/student/chat")
+@RequestMapping("/api/student/assignments")
 @RequiredArgsConstructor
 public class ChatController {
-    
+
     private final ChatService chatService;
-    
-    @PostMapping("/message")
+
+    @PostMapping("/{assignmentId}/chat/messages")
     public ResponseEntity<BasicResponse<ChatResponseDto>> sendMessage(
             @AuthenticationPrincipal AccountResponseDto student,
+            @PathVariable Long assignmentId,
             @RequestBody @Valid ChatMessageRequestDto requestDto) {
-        
-        ChatResponseDto response = chatService.sendMessage(student.id(), requestDto);
+
+        ChatResponseDto response = chatService.sendMessage(student.id(), assignmentId, requestDto.message());
         return ResponseEntity.ok(BasicResponse.ok(response));
     }
 }
