@@ -1,8 +1,8 @@
 package com.iny.side.assignment.web.controller;
 
 import com.iny.side.assignment.application.service.StudentAssignmentService;
-import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
+import com.iny.side.assignment.web.dto.StudentAssignmentSimpleResponseDto;
 import com.iny.side.common.BasicResponse;
 import com.iny.side.common.SliceResponse;
 import com.iny.side.users.web.dto.AccountResponseDto;
@@ -21,7 +21,7 @@ public class StudentAssignmentController {
     private final StudentAssignmentService studentAssignmentService;
 
     @GetMapping(value = "/courses/{courseId}/assignments")
-    public ResponseEntity<BasicResponse<SliceResponse<AssignmentSimpleResponseDto>>> getAll(
+    public ResponseEntity<BasicResponse<SliceResponse<StudentAssignmentSimpleResponseDto>>> getAll(
             @AuthenticationPrincipal AccountResponseDto student,
             @PathVariable Long courseId,
             @RequestParam(value = "page", defaultValue = "0") int page) {

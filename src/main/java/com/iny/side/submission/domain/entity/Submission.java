@@ -84,6 +84,7 @@ public class Submission {
     }
 
     public enum SubmissionStatus {
+        NOT_STARTED, // 진행전
         DRAFT,      // 진행 중
         SUBMITTED   // 제출 완료
     }

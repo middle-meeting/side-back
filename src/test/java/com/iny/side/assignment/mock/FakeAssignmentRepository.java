@@ -2,6 +2,8 @@ package com.iny.side.assignment.mock;
 
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
+import com.iny.side.assignment.web.dto.StudentAssignmentSimpleResponseDto;
+import com.iny.side.submission.domain.entity.Submission;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -64,7 +66,7 @@ public class FakeAssignmentRepository implements AssignmentRepository {
     }
 
     @Override
-    public Slice<Assignment> findAllByCourseId(Long courseId, Pageable pageable) {
+    public Slice<StudentAssignmentSimpleResponseDto> findAllByCourseIdAndStudentId(Long courseId, Long studentId, Pageable pageable) {
         List<Assignment> filtered = data.stream()
                 .filter(assignment -> assignment.getCourse() != null &&
                         Objects.equals(assignment.getCourse().getId(), courseId))
@@ -73,8 +75,13 @@ public class FakeAssignmentRepository implements AssignmentRepository {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), filtered.size());
 
-        List<Assignment> content = start < filtered.size() ? filtered.subList(start, end) : new ArrayList<>();
+        List<Assignment> assignmentContent = start < filtered.size() ? filtered.subList(start, end) : new ArrayList<>();
         boolean hasNext = end < filtered.size();
+
+        // Assignment를 StudentAssignmentSimpleResponseDto로 변환
+        List<StudentAssignmentSimpleResponseDto> content = assignmentContent.stream()
+                .map(assignment -> StudentAssignmentSimpleResponseDto.from(assignment, Submission.SubmissionStatus.DRAFT))
+                .toList();
 
         return new SliceImpl<>(content, pageable, hasNext);
     }

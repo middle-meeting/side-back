@@ -4,6 +4,7 @@ import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
+import com.iny.side.assignment.web.dto.StudentAssignmentSimpleResponseDto;
 import com.iny.side.common.SliceResponse;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
@@ -26,21 +27,12 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
     private final AssignmentRepository assignmentRepository;
 
     @Override
-    public List<AssignmentSimpleResponseDto> getAll(Long courseId, Long studentId) {
-        enrollmentValidationService.validateStudentEnrolledInCourse(courseId, studentId);
-        return assignmentRepository.findAllByCourseId(courseId).stream()
-                .map(AssignmentSimpleResponseDto::from)
-                .toList();
-    }
-
-    @Override
-    public SliceResponse<AssignmentSimpleResponseDto> getAll(Long courseId, Long studentId, int page) {
+    public SliceResponse<StudentAssignmentSimpleResponseDto> getAll(Long courseId, Long studentId, int page) {
         enrollmentValidationService.validateStudentEnrolledInCourse(courseId, studentId);
         Pageable pageable = PageRequest.of(page, 12);
-        Slice<Assignment> assignmentSlice = assignmentRepository.findAllByCourseId(courseId, pageable);
+        Slice<StudentAssignmentSimpleResponseDto> assignmentSlice = assignmentRepository.findAllByCourseIdAndStudentId(courseId, studentId, pageable);
 
-        List<AssignmentSimpleResponseDto> content = assignmentSlice.getContent().stream()
-                .map(AssignmentSimpleResponseDto::from)
+        List<StudentAssignmentSimpleResponseDto> content = assignmentSlice.getContent().stream()
                 .toList();
 
         return SliceResponse.of(content, page, 12, assignmentSlice.hasNext());
@@ -54,8 +46,6 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
         validateAssignmentBelongsToCourse(courseId, assignment);
         return StudentAssignmentDetailResponseDto.from(assignment);
     }
-
-
 
     private static void validateAssignmentBelongsToCourse(Long courseId, Assignment assignment) {
         if (!assignment.getCourse().getId().equals(courseId)) {

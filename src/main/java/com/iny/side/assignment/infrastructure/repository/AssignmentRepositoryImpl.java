@@ -2,6 +2,7 @@ package com.iny.side.assignment.infrastructure.repository;
 
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
+import com.iny.side.assignment.web.dto.StudentAssignmentSimpleResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -22,7 +23,7 @@ public class AssignmentRepositoryImpl implements AssignmentRepository {
     }
 
     @Override
-    public Slice<Assignment> findAllByCourseId(Long courseId, Pageable pageable) {
+    public Slice<StudentAssignmentSimpleResponseDto> findAllByCourseIdAndStudentId(Long courseId, Long studentId, Pageable pageable) {
         return assignmentJpaRepository.findAllByCourseId(courseId, pageable);
     }
 

@@ -4,8 +4,8 @@ import com.iny.side.TestFixtures;
 import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
-import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
+import com.iny.side.assignment.web.dto.StudentAssignmentSimpleResponseDto;
 import com.iny.side.common.SliceResponse;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
@@ -118,26 +118,26 @@ class StudentAssignmentServiceImplTest {
     @Test
     void 학생이_수강하는_강의의_과제_정상조회() {
         // when
-        List<AssignmentSimpleResponseDto> result = studentAssignmentService.getAll(testCourse.getId(), student.getId());
+        SliceResponse<StudentAssignmentSimpleResponseDto> result = studentAssignmentService.getAll(testCourse.getId(), student.getId(), 0);
 
         // then
-        assertThat(result)
+        assertThat(result.getContent())
                 .hasSize(2)
-                .extracting(AssignmentSimpleResponseDto::title)
+                .extracting(StudentAssignmentSimpleResponseDto::title)
                 .containsExactlyInAnyOrder("심장질환 케이스", "상세보기용 과제");
     }
 
     @Test
     void 학생이_수강하지_않는_강의의_과제는_조회_불가() {
         assertThatThrownBy(() ->
-                studentAssignmentService.getAll(999999L, student.getId())
+                studentAssignmentService.getAll(999999L, student.getId(), 0)
         ).isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     void 학생이_수강하는_강의의_과제_페이징_정상조회() {
         // when
-        SliceResponse<AssignmentSimpleResponseDto> result = studentAssignmentService.getAll(testCourse.getId(), student.getId(), 0);
+        SliceResponse<StudentAssignmentSimpleResponseDto> result = studentAssignmentService.getAll(testCourse.getId(), student.getId(), 0);
 
         // then
         assertThat(result.getContent()).hasSize(2);
@@ -147,7 +147,7 @@ class StudentAssignmentServiceImplTest {
         assertThat(result.isFirst()).isTrue();
         assertThat(result.isLast()).isTrue();
         assertThat(result.getContent())
-                .extracting(AssignmentSimpleResponseDto::title)
+                .extracting(StudentAssignmentSimpleResponseDto::title)
                 .containsExactlyInAnyOrder("심장질환 케이스", "상세보기용 과제");
     }
 
