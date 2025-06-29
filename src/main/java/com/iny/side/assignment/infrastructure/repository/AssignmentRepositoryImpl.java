@@ -24,7 +24,7 @@ public class AssignmentRepositoryImpl implements AssignmentRepository {
 
     @Override
     public Slice<StudentAssignmentSimpleResponseDto> findAllByCourseIdAndStudentId(Long courseId, Long studentId, Pageable pageable) {
-        return assignmentJpaRepository.findAllByCourseId(courseId, pageable);
+        return assignmentJpaRepository.findAllByCourseIdAndStudentId(courseId, studentId, pageable);
     }
 
     @Override
