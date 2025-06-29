@@ -9,6 +9,7 @@ import com.iny.side.common.SliceResponse;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.application.service.EnrollmentValidationService;
+import com.iny.side.submission.domain.entity.Submission;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,9 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
         Slice<StudentAssignmentSimpleResponseDto> assignmentSlice = assignmentRepository.findAllByCourseIdAndStudentId(courseId, studentId, pageable);
 
         List<StudentAssignmentSimpleResponseDto> content = assignmentSlice.getContent().stream()
+                .map(dto -> dto.status() == null ?
+                    new StudentAssignmentSimpleResponseDto(dto.id(), dto.title(), dto.dueDate(), dto.objective(), Submission.SubmissionStatus.NOT_STARTED) :
+                    dto)
                 .toList();
 
         return SliceResponse.of(content, page, 12, assignmentSlice.hasNext());
