@@ -3,7 +3,7 @@ package com.iny.side.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iny.side.common.util.WebUtil;
 import com.iny.side.security.token.RestAuthenticationToken;
-import com.iny.side.users.web.dto.AccountDto;
+import com.iny.side.users.web.dto.LoginRequestDto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,16 +44,16 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
 
-        if (!HttpMethod.POST.name().equals(request.getMethod()) || !WebUtil.isAjax(request)) {
-            throw new IllegalArgumentException("Unsupported HTTP method or not an Ajax request");
+        if (!HttpMethod.POST.name().equals(request.getMethod())) {
+            throw new IllegalArgumentException("Unsupported HTTP method");
         }
 
-        AccountDto accountDto = objectMapper.readValue(request.getReader(), AccountDto.class);
-        if (!StringUtils.hasText(accountDto.username()) || !StringUtils.hasText(accountDto.password())) {
+        LoginRequestDto loginRequest = objectMapper.readValue(request.getReader(), LoginRequestDto.class);
+        if (!StringUtils.hasText(loginRequest.username()) || !StringUtils.hasText(loginRequest.password())) {
             throw new AuthenticationServiceException("Username or Password is not provided");
         }
 
-        RestAuthenticationToken authenticationToken = new RestAuthenticationToken(accountDto.username(), accountDto.password());
+        RestAuthenticationToken authenticationToken = new RestAuthenticationToken(loginRequest.username(), loginRequest.password());
 
         return getAuthenticationManager().authenticate(authenticationToken);
     }

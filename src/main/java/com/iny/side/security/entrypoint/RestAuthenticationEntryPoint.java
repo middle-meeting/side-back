@@ -22,7 +22,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType("application/json; charset=UTF-8");
 
         ErrorDetail errorDetail = ErrorDetail.builder()
                 .code("UNAUTHORIZED")

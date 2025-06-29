@@ -1,9 +1,12 @@
 package com.iny.side.security.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iny.side.common.BasicResponse;
 import com.iny.side.security.entrypoint.RestAuthenticationEntryPoint;
 import com.iny.side.security.filter.RestAuthenticationFilter;
 import com.iny.side.security.handler.FormAccessDeniedHandler;
 import com.iny.side.security.handler.RestAccessDeniedHandler;
+import com.iny.side.users.web.dto.LogoutResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +20,14 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @EnableWebSecurity
 @Configuration
@@ -53,33 +59,33 @@ public class SecurityConfig {
         this.authenticationDetailsSource = authenticationDetailsSource;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll() // 정적 자원 설정
-                        .requestMatchers("/", "/signup", "/login*").permitAll()
-                        .requestMatchers("/student/**").hasAuthority("ROLE_STUDENT")
-                        .requestMatchers("/professor/**").hasAuthority("ROLE_PROFESSOR")
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login").permitAll()
-                        .authenticationDetailsSource(authenticationDetailsSource)
-                        .successHandler(successHandler)
-                        .failureHandler(failureHandler)
-                )
-                .authenticationProvider(authenticationProvider)
-                .exceptionHandling(exception -> exception.accessDeniedHandler(new FormAccessDeniedHandler("/denied")))
-                .logout(logout -> logout
-                        .logoutSuccessHandler((request, response, authentication) ->
-                                response.sendRedirect("/"))
-                        .deleteCookies("JSESSIONID")
-                )
-        ;
-        return http.build();
-    }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll() // 정적 자원 설정
+//                        .requestMatchers("/", "/signup", "/login*").permitAll()
+//                        .requestMatchers("/student/**").hasAuthority("ROLE_STUDENT")
+//                        .requestMatchers("/professor/**").hasAuthority("ROLE_PROFESSOR")
+//                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(form -> form
+//                        .loginPage("/login").permitAll()
+//                        .authenticationDetailsSource(authenticationDetailsSource)
+//                        .successHandler(successHandler)
+//                        .failureHandler(failureHandler)
+//                )
+//                .authenticationProvider(authenticationProvider)
+//                .exceptionHandling(exception -> exception.accessDeniedHandler(new FormAccessDeniedHandler("/denied")))
+//                .logout(logout -> logout
+//                        .logoutSuccessHandler((request, response, authentication) ->
+//                                response.sendRedirect("/"))
+//                        .deleteCookies("JSESSIONID")
+//                )
+//        ;
+//        return http.build();
+//    }
 
     @Bean
     @Order(1)
@@ -91,9 +97,13 @@ public class SecurityConfig {
 
         http
                 .securityMatcher("/api/**")
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(new CookieCsrfTokenRepository()) // HttpOnly=true (기본값)
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll() // 정적 자원 설정
-                        .requestMatchers("/api", "/api/signup/**", "/api/login").permitAll()
+                        .requestMatchers("/api/csrf", "/api/signup/**", "/api/login").permitAll()
                         .requestMatchers("/api/student/**").hasAuthority("ROLE_STUDENT")
                         .requestMatchers("/api/professor/**").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
@@ -106,11 +116,18 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
+                            ObjectMapper mapper = new ObjectMapper();
+                            LogoutResponseDto logoutResponse = LogoutResponseDto.success();
+                            BasicResponse<LogoutResponseDto> basicResponse = BasicResponse.ok(logoutResponse);
+
                             response.setStatus(HttpStatus.OK.value());
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
+                            mapper.writeValue(response.getWriter(), basicResponse);
                         })
                         .deleteCookies("JSESSIONID")
                 )
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
         ;
         return http.build();
     }

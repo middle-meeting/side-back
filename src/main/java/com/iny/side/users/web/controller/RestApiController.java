@@ -4,6 +4,7 @@ package com.iny.side.users.web.controller;
 import com.iny.side.common.BasicResponse;
 import com.iny.side.users.application.service.EmailVerificationService;
 import com.iny.side.users.application.service.UserService;
+import com.iny.side.users.web.dto.*;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import com.iny.side.users.web.dto.EmailVerificationConfirmDto;
 import com.iny.side.users.web.dto.EmailVerificationConfirmResponseDto;
@@ -11,10 +12,12 @@ import com.iny.side.users.web.dto.EmailVerificationRequestDto;
 import com.iny.side.users.web.dto.EmailVerificationResponseDto;
 import com.iny.side.users.web.dto.SignupDto;
 import com.iny.side.users.web.dto.SignupResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -66,6 +69,28 @@ public class RestApiController {
         emailVerificationService.resendVerificationCode(requestDto);
         EmailVerificationResponseDto response = EmailVerificationResponseDto.resendSuccess();
         return ResponseEntity.ok(BasicResponse.ok(response));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<BasicResponse<LoginResponseDto>> getCurrentUser(@AuthenticationPrincipal AccountResponseDto accountResponseDto) {
+        LoginResponseDto response = LoginResponseDto.from(accountResponseDto);
+        return ResponseEntity.ok(BasicResponse.ok(response));
+    }
+
+    @GetMapping("/csrf")
+    public ResponseEntity<BasicResponse<CsrfTokenDto>> getCsrfToken(HttpServletRequest request) {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        if (csrfToken == null) {
+            csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        }
+
+        CsrfTokenDto tokenDto = new CsrfTokenDto(
+                csrfToken.getToken(),
+                csrfToken.getHeaderName(),
+                csrfToken.getParameterName()
+        );
+
+        return ResponseEntity.ok(BasicResponse.ok(tokenDto));
     }
 
 }

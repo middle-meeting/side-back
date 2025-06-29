@@ -1,7 +1,9 @@
 package com.iny.side.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iny.side.common.BasicResponse;
 import com.iny.side.users.web.dto.AccountResponseDto;
+import com.iny.side.users.web.dto.LoginResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -23,9 +25,12 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
         ObjectMapper mapper = new ObjectMapper();
 
         AccountResponseDto accountResponseDto = (AccountResponseDto) authentication.getPrincipal();
+        LoginResponseDto loginResponse = LoginResponseDto.from(accountResponseDto);
+        BasicResponse<LoginResponseDto> basicResponse = BasicResponse.ok(loginResponse);
+
         response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        mapper.writeValue(response.getWriter(), accountResponseDto);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
+        mapper.writeValue(response.getWriter(), basicResponse);
 
         clearAuthenticationAttributes(request);
     }
