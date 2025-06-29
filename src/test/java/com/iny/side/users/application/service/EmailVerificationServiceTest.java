@@ -1,6 +1,7 @@
 package com.iny.side.users.application.service;
 
 import com.iny.side.common.exception.DuplicateUsernameException;
+import com.iny.side.common.exception.InvalidVerificationCodeException;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.mock.FakeEmailVerificationRepository;
 import com.iny.side.users.mock.FakeUserRepository;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class EmailVerificationServiceTest {
 
@@ -72,7 +74,7 @@ class EmailVerificationServiceTest {
         String email = "test@example.com";
         String verificationCode = "123456";
         LocalDateTime now = LocalDateTime.now();
-        
+
         EmailVerification emailVerification = EmailVerification.builder()
                 .email(email)
                 .verificationCode(verificationCode)
@@ -83,11 +85,10 @@ class EmailVerificationServiceTest {
 
         EmailVerificationConfirmDto confirmDto = new EmailVerificationConfirmDto(email, verificationCode);
 
-        // when
-        boolean result = emailVerificationService.verifyCode(confirmDto);
+        // when & then
+        assertThatCode(() -> emailVerificationService.verifyCode(confirmDto))
+                .doesNotThrowAnyException();
 
-        // then
-        assertThat(result).isTrue();
         EmailVerification verification = fakeEmailVerificationRepository
                 .findByEmailAndVerificationCode(email, verificationCode).get();
         assertThat(verification.isVerified()).isTrue();
@@ -100,7 +101,7 @@ class EmailVerificationServiceTest {
         String correctCode = "123456";
         String wrongCode = "654321";
         LocalDateTime now = LocalDateTime.now();
-        
+
         EmailVerification emailVerification = EmailVerification.builder()
                 .email(email)
                 .verificationCode(correctCode)
@@ -111,11 +112,9 @@ class EmailVerificationServiceTest {
 
         EmailVerificationConfirmDto confirmDto = new EmailVerificationConfirmDto(email, wrongCode);
 
-        // when
-        boolean result = emailVerificationService.verifyCode(confirmDto);
-
-        // then
-        assertThat(result).isFalse();
+        // when & then
+        assertThatThrownBy(() -> emailVerificationService.verifyCode(confirmDto))
+                .isInstanceOf(InvalidVerificationCodeException.class);
     }
 
     @Test
@@ -124,7 +123,7 @@ class EmailVerificationServiceTest {
         String email = "test@example.com";
         String verificationCode = "123456";
         LocalDateTime pastTime = LocalDateTime.now().minusMinutes(10);
-        
+
         EmailVerification emailVerification = EmailVerification.builder()
                 .email(email)
                 .verificationCode(verificationCode)
@@ -135,20 +134,18 @@ class EmailVerificationServiceTest {
 
         EmailVerificationConfirmDto confirmDto = new EmailVerificationConfirmDto(email, verificationCode);
 
-        // when
-        boolean result = emailVerificationService.verifyCode(confirmDto);
-
-        // then
-        assertThat(result).isFalse();
+        // when & then
+        assertThatThrownBy(() -> emailVerificationService.verifyCode(confirmDto))
+                .isInstanceOf(InvalidVerificationCodeException.class);
     }
 
     @Test
-    void 이미_인증된_코드는_재인증_시_true를_반환한다() {
+    void 이미_인증된_코드는_재인증_시_성공한다() {
         // given
         String email = "test@example.com";
         String verificationCode = "123456";
         LocalDateTime now = LocalDateTime.now();
-        
+
         EmailVerification emailVerification = EmailVerification.builder()
                 .email(email)
                 .verificationCode(verificationCode)
@@ -160,11 +157,9 @@ class EmailVerificationServiceTest {
 
         EmailVerificationConfirmDto confirmDto = new EmailVerificationConfirmDto(email, verificationCode);
 
-        // when
-        boolean result = emailVerificationService.verifyCode(confirmDto);
-
-        // then
-        assertThat(result).isTrue();
+        // when & then
+        assertThatCode(() -> emailVerificationService.verifyCode(confirmDto))
+                .doesNotThrowAnyException();
     }
 
     @Test

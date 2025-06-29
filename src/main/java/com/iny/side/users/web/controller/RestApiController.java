@@ -56,10 +56,8 @@ public class RestApiController {
 
     @PostMapping("/signup/verify-email")
     public ResponseEntity<BasicResponse<EmailVerificationConfirmResponseDto>> verifyEmail(@RequestBody @Valid EmailVerificationConfirmDto confirmDto) {
-        boolean verified = emailVerificationService.verifyCode(confirmDto);
-        EmailVerificationConfirmResponseDto response = verified
-            ? EmailVerificationConfirmResponseDto.success()
-            : EmailVerificationConfirmResponseDto.failure();
+        emailVerificationService.verifyCode(confirmDto);
+        EmailVerificationConfirmResponseDto response = EmailVerificationConfirmResponseDto.success();
         return ResponseEntity.ok(BasicResponse.ok(response));
     }
 

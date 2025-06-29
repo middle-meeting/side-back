@@ -5,10 +5,10 @@ import com.iny.side.users.web.dto.EmailVerificationRequestDto;
 
 public interface EmailVerificationService {
     void sendVerificationCode(EmailVerificationRequestDto requestDto);
-    
-    boolean verifyCode(EmailVerificationConfirmDto confirmDto);
-    
+
+    void verifyCode(EmailVerificationConfirmDto confirmDto);
+
     void resendVerificationCode(EmailVerificationRequestDto requestDto);
-    
+
     boolean isEmailVerified(String email);
 }

@@ -1,6 +1,7 @@
 package com.iny.side.users.application.service;
 
 import com.iny.side.common.exception.DuplicateUsernameException;
+import com.iny.side.common.exception.InvalidVerificationCodeException;
 import com.iny.side.users.domain.entity.EmailVerification;
 import com.iny.side.users.domain.event.EmailVerificationRequestedEvent;
 import com.iny.side.users.domain.repository.EmailVerificationRepository;
@@ -62,31 +63,29 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     @Override
     @Transactional
-    public boolean verifyCode(EmailVerificationConfirmDto confirmDto) {
+    public void verifyCode(EmailVerificationConfirmDto confirmDto) {
         String email = confirmDto.email();
         String code = confirmDto.verificationCode();
-        
-        Optional<EmailVerification> verificationOpt = 
+
+        Optional<EmailVerification> verificationOpt =
                 emailVerificationRepository.findByEmailAndVerificationCode(email, code);
-        
+
         if (verificationOpt.isEmpty()) {
-            return false;
+            throw new InvalidVerificationCodeException();
         }
-        
+
         EmailVerification verification = verificationOpt.get();
-        
+
         if (verification.isExpired()) {
-            return false;
+            throw new InvalidVerificationCodeException();
         }
-        
+
         if (verification.isVerified()) {
-            return true;
+            return; // 이미 인증된 경우 성공으로 처리
         }
-        
+
         verification.verify();
         emailVerificationRepository.save(verification);
-        
-        return true;
     }
 
     @Override
