@@ -12,8 +12,7 @@ public record LoginResponseDto(
         String major,
         Integer grade,
         String studentId,
-        String employeeId,
-        String message
+        String employeeId
 ) {
     
     public static LoginResponseDto from(Account account) {
@@ -26,8 +25,7 @@ public record LoginResponseDto(
                 account.getMajor(),
                 account.getGrade(),
                 account.getStudentId(),
-                account.getEmployeeId(),
-                "로그인이 완료되었습니다."
+                account.getEmployeeId()
         );
     }
     
@@ -41,8 +39,7 @@ public record LoginResponseDto(
                 accountDto.major(),
                 accountDto.grade(),
                 accountDto.studentId(),
-                accountDto.employeeId(),
-                "로그인이 완료되었습니다."
+                accountDto.employeeId()
         );
     }
 
@@ -56,8 +53,7 @@ public record LoginResponseDto(
                 accountResponseDto.major(),
                 accountResponseDto.grade(),
                 accountResponseDto.studentId(),
-                accountResponseDto.employeeId(),
-                "로그인이 완료되었습니다."
+                accountResponseDto.employeeId()
         );
     }
 
