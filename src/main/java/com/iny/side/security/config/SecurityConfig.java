@@ -2,6 +2,7 @@ package com.iny.side.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iny.side.common.BasicResponse;
+import com.iny.side.common.config.CorsConfig;
 import com.iny.side.security.entrypoint.RestAuthenticationEntryPoint;
 import com.iny.side.security.filter.RestAuthenticationFilter;
 import com.iny.side.security.handler.FormAccessDeniedHandler;
@@ -41,6 +42,8 @@ public class SecurityConfig {
     private final AuthenticationFailureHandler restFailureHandler;
     private final AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
 
+    private final CorsConfig corsConfig;
+
     public SecurityConfig(
             @Qualifier("authenticationProvider") AuthenticationProvider authenticationProvider,
             @Qualifier("restAuthenticationProvider") AuthenticationProvider restAuthenticationProvider,
@@ -48,7 +51,7 @@ public class SecurityConfig {
             @Qualifier("restSuccessHandler") AuthenticationSuccessHandler restSuccessHandler,
             @Qualifier("failureHandler") AuthenticationFailureHandler failureHandler,
             @Qualifier("restFailureHandler") AuthenticationFailureHandler restFailureHandler,
-            AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource) {
+            AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource, CorsConfig corsConfig) {
 
         this.authenticationProvider = authenticationProvider;
         this.restAuthenticationProvider = restAuthenticationProvider;
@@ -57,6 +60,7 @@ public class SecurityConfig {
         this.failureHandler = failureHandler;
         this.restFailureHandler = restFailureHandler;
         this.authenticationDetailsSource = authenticationDetailsSource;
+        this.corsConfig = corsConfig;
     }
 
 //    @Bean
@@ -100,7 +104,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(new CookieCsrfTokenRepository()) // HttpOnly=true (기본값)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                )
+                ).addFilter(corsConfig.corsFilter())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll() // 정적 자원 설정
                         .requestMatchers("/api/csrf", "/api/signup/**", "/api/login").permitAll()
