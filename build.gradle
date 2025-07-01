@@ -45,3 +45,6 @@ tasks.withType(JavaCompile).configureEach {
 	options.compilerArgs += ["-parameters"]
 }
 
+bootJar {
+	archiveFileName = 'app.jar'
+}
