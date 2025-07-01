@@ -16,7 +16,7 @@ COPY build.gradle settings.gradle .
 RUN chmod +x gradlew
 
 # 의존성 다운로드 및 빌드 (테스트 포함)
-./gradlew clean build -x test --no-daemon
+RUN ./gradlew clean build -x test --no-daemon
 
 # 2단계: 런타임용 경량 이미지
 FROM eclipse-temurin:21-jre
