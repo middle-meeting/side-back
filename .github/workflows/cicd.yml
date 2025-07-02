@@ -35,7 +35,7 @@ jobs:
       run: chmod +x gradlew
       
     - name: Build with Gradle
-      run: ./gradlew clean build -x test
+      run: ./gradlew clean bootJar -x test
 
     - name: Decode GCP Service Account
       run: echo "${{ secrets.GCP_SA_KEY }}" | base64 -d > "${{ github.workspace }}/gcp-key.json"
