@@ -47,4 +47,5 @@ tasks.withType(JavaCompile).configureEach {
 
 bootJar {
 	archiveFileName = 'app.jar'
+	mainClass = 'com.iny.side.SideApplication'
 }
