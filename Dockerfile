@@ -20,7 +20,6 @@ RUN ./gradlew clean build -x test --no-daemon
 
 # 2단계: 런타임용 경량 이미지
 FROM eclipse-temurin:21-jre
-
 WORKDIR /app
 
 # 빌드 결과물만 복사
@@ -30,4 +29,4 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 EXPOSE 8080
 
 # 실행 커맨드
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar", "com.iny.side.SideApplication"]
