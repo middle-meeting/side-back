@@ -54,6 +54,7 @@ jobs:
         host: ${{ secrets.VM_HOST }}
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+        passphrase: ${{ secrets.VM_SSH_PASSPHRASE }}
         script: |
           docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GIT_TOKEN }}
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
