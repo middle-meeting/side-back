@@ -45,3 +45,14 @@ tasks.withType(JavaCompile).configureEach {
 	options.compilerArgs += ["-parameters"]
 }
 
+springBoot {
+	mainClass = 'com.iny.side.SideApplication'
+}
+
+tasks.named('jar') {
+	enabled = false
+}
+
+bootJar {
+	archiveFileName = 'app.jar'
+}
