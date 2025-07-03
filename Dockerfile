@@ -23,7 +23,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # 빌드 결과물만 복사
-COPY --from=builder /app/build/libs/app.jar app.jar
+COPY --from=builder /app/build/libs/*.jar app.jar
 
 # Cloud Run 기본 포트 노출
 EXPOSE 8080
