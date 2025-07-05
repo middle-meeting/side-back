@@ -1,6 +1,5 @@
 package com.iny.side.chat.infrastructure.external.dto;
 
-import com.iny.side.chat.web.dto.ChatMessageResponseDto;
 import com.iny.side.common.domain.GenderType;
 
 import java.util.List;
