@@ -54,9 +54,10 @@ jobs:
         host: ${{ secrets.VM_HOST }}
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+        passphrase: ${{ secrets.VM_SSH_PASSPHRASE }}
         script: |
           docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GIT_TOKEN }}
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           docker stop ${{ env.IMAGE_NAME }} || true
           docker rm ${{ env.IMAGE_NAME }} || true
-          docker run -d --name ${{ env.IMAGE_NAME }} -p 8080:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          docker run -d --name ${{ env.IMAGE_NAME }} --network side-network -p 8080:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
