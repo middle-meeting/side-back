@@ -49,6 +49,13 @@ public class ChatMessage {
 
     public enum SpeakerType {
         STUDENT,
-        AI
+        AI;
+
+        public String toGemmaRole() {
+            return switch (this) {
+                case STUDENT -> "user";
+                case AI      -> "assistant";
+            };
+        }
     }
 }
