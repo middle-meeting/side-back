@@ -8,7 +8,5 @@ public interface EmailVerificationService {
 
     void verifyCode(EmailVerificationConfirmDto confirmDto);
 
-    void resendVerificationCode(EmailVerificationRequestDto requestDto);
-
     boolean isEmailVerified(String email);
 }

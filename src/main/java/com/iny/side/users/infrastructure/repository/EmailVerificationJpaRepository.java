@@ -13,7 +13,9 @@ public interface EmailVerificationJpaRepository extends JpaRepository<EmailVerif
     
     @Query("SELECT e FROM EmailVerification e WHERE e.email = :email ORDER BY e.createdAt DESC LIMIT 1")
     Optional<EmailVerification> findLatestByEmail(@Param("email") String email);
-    
+
+    Optional<EmailVerification> findTopByEmailOrderByCreatedAtDesc(String email);
+
     void deleteByEmail(String email);
     
     boolean existsByEmailAndVerified(String email, Boolean verified);

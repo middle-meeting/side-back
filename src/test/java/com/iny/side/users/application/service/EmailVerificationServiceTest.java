@@ -1,6 +1,7 @@
 package com.iny.side.users.application.service;
 
 import com.iny.side.common.exception.DuplicateUsernameException;
+import com.iny.side.common.exception.EmailResendTooSoonException;
 import com.iny.side.common.exception.InvalidVerificationCodeException;
 import com.iny.side.users.domain.entity.Account;
 import com.iny.side.users.mock.FakeEmailVerificationRepository;
@@ -163,26 +164,31 @@ class EmailVerificationServiceTest {
     }
 
     @Test
-    void 인증번호를_재전송할_수_있다() {
+    void 이메일_전송_3분_후_다시_전송_가능() {
         // given
         String email = "test@example.com";
         String firstCode = "111111";
         String secondCode = "222222";
         EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
 
-        // 첫 번째 전송
-        fakeVerificationCodeGenerator.setFixedCode(firstCode);
-        emailVerificationService.sendVerificationCode(requestDto);
+        // 3분 전 시간으로 설정된 인증 정보 생성
+        LocalDateTime pastTime = LocalDateTime.now().minusMinutes(4);
+        EmailVerification oldVerification = EmailVerification.builder()
+                .email(email)
+                .verificationCode(firstCode)
+                .createdAt(pastTime)
+                .expiresAt(pastTime.plusMinutes(3))
+                .build();
+        fakeEmailVerificationRepository.save(oldVerification);
 
-        // when - 재전송 (다른 코드로 설정)
+        // when - 3분 후 다시 전송 (다른 코드로 설정)
         fakeVerificationCodeGenerator.setFixedCode(secondCode);
-        emailVerificationService.resendVerificationCode(requestDto);
+        emailVerificationService.sendVerificationCode(requestDto);
 
         // then
         EmailVerification latestVerification = fakeEmailVerificationRepository.findLatestByEmail(email).get();
         assertThat(latestVerification.getEmail()).isEqualTo(email);
         assertThat(latestVerification.getVerificationCode()).isEqualTo(secondCode);
-        assertThat(fakeVerificationCodeGenerator.getCallCount()).isEqualTo(2);
     }
 
     @Test
@@ -235,14 +241,18 @@ class EmailVerificationServiceTest {
     @Test
     void 여러_번_전송시_인증번호_생성기가_매번_호출된다() {
         // given
-        String email = "test@example.com";
-        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+        String email1 = "test1@example.com";
+        String email2 = "test2@example.com";
+        String email3 = "test3@example.com";
+        EmailVerificationRequestDto requestDto1 = new EmailVerificationRequestDto(email1);
+        EmailVerificationRequestDto requestDto2 = new EmailVerificationRequestDto(email2);
+        EmailVerificationRequestDto requestDto3 = new EmailVerificationRequestDto(email3);
         fakeVerificationCodeGenerator.resetCallCount();
 
-        // when
-        emailVerificationService.sendVerificationCode(requestDto);
-        emailVerificationService.sendVerificationCode(requestDto);
-        emailVerificationService.resendVerificationCode(requestDto);
+        // when - 서로 다른 이메일로 전송하여 3분 제한 회피
+        emailVerificationService.sendVerificationCode(requestDto1);
+        emailVerificationService.sendVerificationCode(requestDto2);
+        emailVerificationService.sendVerificationCode(requestDto3);
 
         // then
         assertThat(fakeVerificationCodeGenerator.getCallCount()).isEqualTo(3);
@@ -292,6 +302,79 @@ class EmailVerificationServiceTest {
         // 기존 사용자 생성
         fakeUserRepository.save(createTestAccount(email));
 
+        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+
+        // when & then
+        assertThatThrownBy(() -> emailVerificationService.sendVerificationCode(requestDto))
+                .isInstanceOf(DuplicateUsernameException.class);
+    }
+
+    @Test
+    void 이메일_전송_3분_이내_재요청시_예외_발생() {
+        // given
+        String email = "test@example.com";
+        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+
+        // 첫 번째 전송
+        emailVerificationService.sendVerificationCode(requestDto);
+
+        // when & then - 바로 다시 전송 시도
+        assertThatThrownBy(() -> emailVerificationService.sendVerificationCode(requestDto))
+                .isInstanceOf(EmailResendTooSoonException.class)
+                .satisfies(exception -> {
+                    EmailResendTooSoonException ex = (EmailResendTooSoonException) exception;
+                    assertThat(ex.getMessageKey()).isEqualTo("error.email.resend_too_soon");
+                    assertThat(ex.getHttpStatus()).isEqualTo(org.springframework.http.HttpStatus.TOO_MANY_REQUESTS);
+                    assertThat(ex.getArgs()).hasSize(1);
+                    assertThat((Long) ex.getArgs()[0]).isGreaterThan(0);
+                    assertThat((Long) ex.getArgs()[0]).isLessThanOrEqualTo(180); // 3분 = 180초
+                });
+    }
+
+    @Test
+    void 이메일_전송_3분_후_다시_요청시_성공() {
+        // given
+        String email = "test@example.com";
+        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+
+        // 3분 전 시간으로 설정된 인증 정보 생성
+        LocalDateTime pastTime = LocalDateTime.now().minusMinutes(4);
+        EmailVerification oldVerification = EmailVerification.builder()
+                .email(email)
+                .verificationCode("111111")
+                .createdAt(pastTime)
+                .expiresAt(pastTime.plusMinutes(3))
+                .build();
+        fakeEmailVerificationRepository.save(oldVerification);
+
+        String newCode = "222222";
+        fakeVerificationCodeGenerator.setFixedCode(newCode);
+
+        // when - 3분 후 다시 전송
+        assertThatCode(() -> emailVerificationService.sendVerificationCode(requestDto))
+                .doesNotThrowAnyException();
+
+        // then
+        EmailVerification latestVerification = fakeEmailVerificationRepository.findLatestByEmail(email).get();
+        assertThat(latestVerification.getVerificationCode()).isEqualTo(newCode);
+    }
+
+    @Test
+    void 기존_인증_기록이_없으면_이메일_전송_성공() {
+        // given
+        String email = "test@example.com";
+        EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
+
+        // when & then - 기존 인증 기록이 없으면 3분 제한 없이 전송 성공
+        assertThatCode(() -> emailVerificationService.sendVerificationCode(requestDto))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void 이미_가입된_이메일로_전송_요청시_예외_발생() {
+        // given
+        String email = "existing@test.com";
+        fakeUserRepository.save(createTestAccount(email));
         EmailVerificationRequestDto requestDto = new EmailVerificationRequestDto(email);
 
         // when & then

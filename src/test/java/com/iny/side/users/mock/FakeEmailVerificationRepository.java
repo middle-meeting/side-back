@@ -15,8 +15,6 @@ public class FakeEmailVerificationRepository implements EmailVerificationReposit
 
     @Override
     public EmailVerification save(EmailVerification emailVerification) {
-        // 기존 같은 이메일의 인증 정보 삭제
-        data.removeIf(item -> Objects.equals(item.getEmail(), emailVerification.getEmail()));
         data.add(emailVerification);
         return emailVerification;
     }
@@ -31,6 +29,13 @@ public class FakeEmailVerificationRepository implements EmailVerificationReposit
 
     @Override
     public Optional<EmailVerification> findLatestByEmail(String email) {
+        return data.stream()
+                .filter(verification -> Objects.equals(verification.getEmail(), email))
+                .max(Comparator.comparing(EmailVerification::getCreatedAt));
+    }
+
+    @Override
+    public Optional<EmailVerification> findTopByEmailOrderByCreatedAtDesc(String email) {
         return data.stream()
                 .filter(verification -> Objects.equals(verification.getEmail(), email))
                 .max(Comparator.comparing(EmailVerification::getCreatedAt));

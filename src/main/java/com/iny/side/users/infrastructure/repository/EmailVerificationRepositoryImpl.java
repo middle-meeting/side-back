@@ -29,6 +29,11 @@ public class EmailVerificationRepositoryImpl implements EmailVerificationReposit
     }
 
     @Override
+    public Optional<EmailVerification> findTopByEmailOrderByCreatedAtDesc(String email) {
+        return emailVerificationJpaRepository.findTopByEmailOrderByCreatedAtDesc(email);
+    }
+
+    @Override
     public void deleteByEmail(String email) {
         emailVerificationJpaRepository.deleteByEmail(email);
     }

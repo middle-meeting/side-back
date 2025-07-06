@@ -51,7 +51,7 @@ public class UserController {
 
     @PostMapping("/signup/resend-verification")
     public ResponseEntity<BasicResponse<EmailVerificationResponseDto>> resendVerificationCode(@RequestBody @Valid EmailVerificationRequestDto requestDto) {
-        emailVerificationService.resendVerificationCode(requestDto);
+        emailVerificationService.sendVerificationCode(requestDto);
         EmailVerificationResponseDto response = EmailVerificationResponseDto.resendSuccess();
         return ResponseEntity.ok(BasicResponse.ok(response));
     }
