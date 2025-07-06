@@ -24,15 +24,19 @@ public class Course {
     @Column(name = "semester", nullable = false)
     private String semester;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id")
     private Account account;
 
     @Builder
-    public Course(Long id, String name, String semester, Account account) {
+    public Course(Long id, String name, String semester, String description, Account account) {
         this.id = id;
         this.name = name;
         this.semester = semester;
+        this.description = description;
         this.account = account;
     }
 
