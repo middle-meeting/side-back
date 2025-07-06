@@ -1,11 +1,15 @@
 package com.iny.side.course.application.service;
 
 import com.iny.side.common.SliceResponse;
+import com.iny.side.common.exception.ForbiddenException;
+import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.course.mock.FakeEnrollmentRepository;
-import com.iny.side.course.web.dto.EnrolledCoursesDto;
+import com.iny.side.course.mock.FakeEnrollmentValidationService;
+import com.iny.side.course.web.dto.EnrolledCoursesDetailDto;
+import com.iny.side.course.web.dto.EnrolledCoursesSimpleDto;
 import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
@@ -16,24 +20,30 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CourseServiceTest {
 
     private CourseService courseService;
+    private FakeEnrollmentRepository fakeEnrollmentRepository;
+    private FakeCourseRepository fakeCourseRepository;
 
     private Account professor;
     private Account student;
+    private Course 인체학입문;
 
     @BeforeEach
     void setUp() {
 
         FakeUserRepository fakeUserRepository = new FakeUserRepository();
-        FakeCourseRepository fakeCourseRepository = new FakeCourseRepository();
-        FakeEnrollmentRepository fakeEnrollmentRepository = new FakeEnrollmentRepository();
+        fakeCourseRepository = new FakeCourseRepository();
+        fakeEnrollmentRepository = new FakeEnrollmentRepository();
+        FakeEnrollmentValidationService fakeEnrollmentValidationService = new FakeEnrollmentValidationService(fakeEnrollmentRepository, fakeCourseRepository);
 
         courseService = CourseServiceImpl.builder()
                 .courseRepository(fakeCourseRepository)
                 .enrollmentRepository(fakeEnrollmentRepository)
+                .enrollmentValidationService(fakeEnrollmentValidationService)
                 .build();
 
         student = Account.builder()
@@ -79,9 +89,10 @@ class CourseServiceTest {
                 .semester("2025-01")
                 .account(professor)
                 .build();
-        Course 인체학입문 = Course.builder()
+        인체학입문 = Course.builder()
                 .name("인체학 입문")
                 .semester("2025-01")
+                .description("인체의 구조와 기능에 대해 학습합니다.")
                 .account(professor)
                 .build();
         Course 소프트웨어공학입문 = Course.builder()
@@ -92,7 +103,7 @@ class CourseServiceTest {
 
         fakeCourseRepository.save(신경학);
         fakeCourseRepository.save(한의학입문);
-        fakeCourseRepository.save(인체학입문);
+        인체학입문 = fakeCourseRepository.save(인체학입문);
         fakeCourseRepository.save(소프트웨어공학입문);
 
         Enrollment testEnrollment = Enrollment.builder()
@@ -127,21 +138,21 @@ class CourseServiceTest {
     @Test
     void 학생은_해당학기에_본인이_수강하는_과목_조회_가능() {
         // when
-        List<EnrolledCoursesDto> result = courseService.getAllEnrolled(student.getId(), "2025-01");
+        List<EnrolledCoursesSimpleDto> result = courseService.getAllEnrolled(student.getId(), "2025-01");
 
         // then
         assertThat(result).hasSize(1);
         assertThat(result).allMatch(enrolledCourse -> enrolledCourse.professorName().equals("이교수"));
         assertThat(result).allMatch(enrolledCourse -> enrolledCourse.semester().equals("2025-01"));
         assertThat(result)
-                .extracting(EnrolledCoursesDto::name)
+                .extracting(EnrolledCoursesSimpleDto::name)
                 .containsExactlyInAnyOrder("인체학 입문");
     }
 
     @Test
     void 학생은_해당학기에_본인이_수강하는_과목을_페이징하여_조회_가능() {
         // when
-        SliceResponse<EnrolledCoursesDto> result = courseService.getAllEnrolled(student.getId(), "2025-01", 0);
+        SliceResponse<EnrolledCoursesSimpleDto> result = courseService.getAllEnrolled(student.getId(), "2025-01", 0);
 
         // then
         assertThat(result.getContent()).hasSize(1);
@@ -153,7 +164,42 @@ class CourseServiceTest {
         assertThat(result.getContent()).allMatch(enrolledCourse -> enrolledCourse.professorName().equals("이교수"));
         assertThat(result.getContent()).allMatch(enrolledCourse -> enrolledCourse.semester().equals("2025-01"));
         assertThat(result.getContent())
-                .extracting(EnrolledCoursesDto::name)
+                .extracting(EnrolledCoursesSimpleDto::name)
                 .containsExactlyInAnyOrder("인체학 입문");
+    }
+
+    @Test
+    void 학생은_수강중인_과목의_상세정보를_조회할_수_있다() {
+        // when
+        EnrolledCoursesDetailDto result = courseService.getEnrolled(student.getId(), 인체학입문.getId());
+
+        // then
+        assertThat(result.id()).isEqualTo(인체학입문.getId());
+        assertThat(result.name()).isEqualTo("인체학 입문");
+        assertThat(result.semester()).isEqualTo("2025-01");
+        assertThat(result.description()).isEqualTo("인체의 구조와 기능에 대해 학습합니다.");
+        assertThat(result.professorName()).isEqualTo("이교수");
+    }
+
+    @Test
+    void 수강하지_않은_과목의_상세정보_조회시_예외_발생() {
+        // given
+        Course 다른과목 = Course.builder()
+                .name("다른 과목")
+                .semester("2025-01")
+                .account(professor)
+                .build();
+        Course savedCourse = fakeCourseRepository.save(다른과목);
+
+        // when & then
+        assertThatThrownBy(() -> courseService.getEnrolled(student.getId(), savedCourse.getId()))
+                .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void 존재하지_않는_과목의_상세정보_조회시_예외_발생() {
+        // when & then
+        assertThatThrownBy(() -> courseService.getEnrolled(student.getId(), 999L))
+                .isInstanceOf(NotFoundException.class);
     }
 }
