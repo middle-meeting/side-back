@@ -15,6 +15,9 @@ public interface AssignmentJpaRepository extends JpaRepository<Assignment, Long>
     @Query("SELECT a FROM Assignment a JOIN FETCH a.course c JOIN FETCH c.account where a.course.id = :courseId")
     List<Assignment> findAllByCourseId(@Param("courseId") Long courseId);
 
+    @Query("SELECT a FROM Assignment a JOIN FETCH a.course c JOIN FETCH c.account where a.course.id = :courseId")
+    Slice<Assignment> findAllByCourseId(@Param("courseId") Long courseId, Pageable pageable);
+
     @Query("SELECT new com.iny.side.assignment.web.dto.StudentAssignmentSimpleResponseDto(a.id, a.title, a.dueDate, a.objective, s.status) FROM Assignment a LEFT JOIN Submission s ON a.id = s.assignment.id AND s.student.id = :studentId WHERE a.course.id = :courseId")
     Slice<StudentAssignmentSimpleResponseDto> findAllByCourseIdAndStudentId(@Param("courseId") Long courseId, @Param("studentId") Long studentId, Pageable pageable);
 }

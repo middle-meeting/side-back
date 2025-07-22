@@ -5,6 +5,7 @@ import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
 import com.iny.side.common.BasicResponse;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,11 @@ public class ProfessorAssignmentController {
     private final ProfessorAssignmentService professorAssignmentService;
 
     @GetMapping(value = "/courses/{courseId}/assignments")
-    public ResponseEntity<BasicResponse<List<AssignmentSimpleResponseDto>>> getAll(
+    public ResponseEntity<BasicResponse<SliceResponse<AssignmentSimpleResponseDto>>> getAll(
             @AuthenticationPrincipal AccountResponseDto professor,
-            @PathVariable Long courseId) {
-        return ResponseEntity.ok(BasicResponse.ok(professorAssignmentService.getAll(courseId, professor.id())));
+            @PathVariable Long courseId,
+            @RequestParam(value = "page", defaultValue = "0") int page) {
+        return ResponseEntity.ok(BasicResponse.ok(professorAssignmentService.getAll(courseId, professor.id(), page)));
     }
 
     @PostMapping(value = "/courses/{courseId}/assignments")
