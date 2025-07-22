@@ -6,6 +6,7 @@ import com.iny.side.assignment.domain.vo.AssignmentInfo;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.application.service.EnrollmentValidationService;
@@ -13,6 +14,9 @@ import com.iny.side.course.domain.entity.Course;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,11 +30,14 @@ public class ProfessorAssignmentServiceImpl implements ProfessorAssignmentServic
     private final EnrollmentValidationService enrollmentValidationService;
 
     @Override
-    public List<AssignmentSimpleResponseDto> getAll(Long courseId, Long professorId) {
+    public SliceResponse<AssignmentSimpleResponseDto> getAll(Long courseId, Long professorId, int page) {
         enrollmentValidationService.validateProfessorOwnsCourse(courseId, professorId);
-        return assignmentRepository.findAllByCourseId(courseId).stream()
-                .map(AssignmentSimpleResponseDto::from)
-                .toList();
+        Pageable pageable = PageRequest.of(page, 12);
+        Slice<Assignment> assignmentSlice = assignmentRepository.findAllByCourseId(courseId, pageable);
+
+        List<AssignmentSimpleResponseDto> content = assignmentSlice.getContent().stream()
+                .map(AssignmentSimpleResponseDto::from).toList();
+        return SliceResponse.of(content, page, 12, assignmentSlice.hasNext());
     }
 
     @Override

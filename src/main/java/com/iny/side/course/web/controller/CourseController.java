@@ -2,6 +2,7 @@ package com.iny.side.course.web.controller;
 
 
 import com.iny.side.common.BasicResponse;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.course.application.service.CourseService;
 import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import com.iny.side.users.web.dto.AccountResponseDto;
@@ -23,9 +24,10 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping(value = "/professor/courses")
-    public ResponseEntity<BasicResponse<List<ProfessorCoursesDto>>> getAll(
+    public ResponseEntity<BasicResponse<SliceResponse<ProfessorCoursesDto>>> getAll(
             @AuthenticationPrincipal AccountResponseDto professor,
-            @RequestParam(value = "semester") String semester) {
-        return ResponseEntity.ok(BasicResponse.ok(courseService.getAll(professor.id(), semester)));
+            @RequestParam(value = "semester") String semester,
+            @RequestParam(value = "page", defaultValue = "0") int page) {
+        return ResponseEntity.ok(BasicResponse.ok(courseService.getAll(professor.id(), semester, page)));
     }
 }

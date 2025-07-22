@@ -1,5 +1,6 @@
 package com.iny.side.assignment.application.service;
 
+import com.iny.side.common.SliceResponse;
 import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
@@ -127,10 +128,10 @@ class ProfessorAssignmentServiceTest {
     @Test
     void 교수는_본인_강의의_과제_여러개_정상조회() {
         // when
-        List<AssignmentSimpleResponseDto> result = professorAssignmentService.getAll(testCourse.getId(), professor.getId());
+        SliceResponse<AssignmentSimpleResponseDto> result = professorAssignmentService.getAll(testCourse.getId(), professor.getId(), 3);
 
         // then
-        assertThat(result)
+        assertThat(result.getContent())
                 .hasSize(3)
                 .extracting(AssignmentSimpleResponseDto::title)
                 .containsExactlyInAnyOrder("심장질환 케이스", "소화기 질환", "상세보기용 과제");
