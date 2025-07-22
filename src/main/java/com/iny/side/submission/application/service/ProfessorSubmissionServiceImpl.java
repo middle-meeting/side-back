@@ -4,7 +4,6 @@ import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.application.service.EnrollmentValidationService;
-import com.iny.side.submission.domain.entity.Prescription;
 import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.domain.repository.PrescriptionRepository;
 import com.iny.side.submission.domain.repository.SubmissionRepository;
