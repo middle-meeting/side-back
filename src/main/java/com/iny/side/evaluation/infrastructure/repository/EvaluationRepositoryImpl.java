@@ -5,6 +5,8 @@ import com.iny.side.evaluation.domain.repository.EvaluationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class EvaluationRepositoryImpl implements EvaluationRepository {
@@ -13,5 +15,10 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     @Override
     public Evaluation save(Evaluation evaluation) {
         return evaluationJpaRepository.save(evaluation);
+    }
+
+    @Override
+    public Optional<Evaluation> findBySubmissionId(Long submissionId) {
+        return evaluationJpaRepository.findBySubmissionId(submissionId);
     }
 }
