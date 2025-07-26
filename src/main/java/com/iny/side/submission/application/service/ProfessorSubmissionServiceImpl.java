@@ -11,6 +11,7 @@ import com.iny.side.submission.web.dto.PrescriptionResponseDto;
 import com.iny.side.submission.web.dto.SubmissionResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class ProfessorSubmissionServiceImpl implements ProfessorSubmissionServic
     private final EnrollmentValidationService enrollmentValidationService;
 
     @Override
+    @Transactional(readOnly = true)
     public SubmissionResponseDto get(Long professorId, Long assignmentId, Long studentId) {
         // 1. 과제 조회
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)

@@ -46,6 +46,7 @@ public class ProfessorEvaluationServiceImpl implements ProfessorEvaluationServic
     }
 
     @Override
+    @Transactional
     public List<ChatEvaluationResponseDto> evaluateChats(Long accountId, Long courseId, Long assignmentId, Long studentId, ChatsEvaluationRequestDto evaluationRequestDto) {
         // 1. 강의에 대한 교수와 학생의 권한 체크
         enrollmentValidationService.validateProfessorOwnsCourse(courseId, accountId);
