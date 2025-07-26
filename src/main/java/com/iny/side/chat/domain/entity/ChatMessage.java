@@ -1,5 +1,6 @@
 package com.iny.side.chat.domain.entity;
 
+import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.submission.domain.entity.Submission;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,6 +34,12 @@ public class ChatMessage {
     @Column(name = "message", nullable = false, length = 1000)
     private String message;
 
+    @Column(name = "score")
+    private Integer score;
+
+    @Column(name = "feedback", columnDefinition = "TEXT")
+    private String feedback;
+
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
 
@@ -57,5 +64,16 @@ public class ChatMessage {
                 case AI      -> "assistant";
             };
         }
+    }
+
+    public void validateEvaluable() {
+        if (this.speaker.equals(SpeakerType.AI)) {
+            throw new ForbiddenException("채점은 학생의 대화에만 가능");
+        }
+    }
+
+    public void evaluate(int score, String feedback) {
+        this.score = score;
+        this.feedback = feedback;
     }
 }

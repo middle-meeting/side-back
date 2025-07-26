@@ -6,6 +6,7 @@ import com.iny.side.chat.domain.repository.ChatMessageRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class FakeChatMessageRepository implements ChatMessageRepository {
@@ -47,5 +48,12 @@ public class FakeChatMessageRepository implements ChatMessageRepository {
                 .mapToInt(ChatMessage::getTurnNumber)
                 .max()
                 .orElse(0);
+    }
+
+    @Override
+    public Optional<ChatMessage> findById(Long chatMessageId) {
+        return data.stream()
+                .filter(message -> Objects.equals(message.getId(), chatMessageId))
+                .findFirst();
     }
 }
