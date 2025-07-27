@@ -1,6 +1,5 @@
 package com.iny.side.evaluation.application.service;
 
-import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.evaluation.domain.entity.Evaluation;
 import com.iny.side.evaluation.domain.repository.EvaluationRepository;

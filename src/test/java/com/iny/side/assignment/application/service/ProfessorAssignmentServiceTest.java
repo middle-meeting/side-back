@@ -1,12 +1,11 @@
 package com.iny.side.assignment.application.service;
 
-import com.iny.side.common.SliceResponse;
-import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
@@ -15,11 +14,11 @@ import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.course.mock.FakeEnrollmentValidationService;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
+import com.iny.side.users.mock.FakeUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
