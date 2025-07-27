@@ -128,7 +128,7 @@ class ProfessorAssignmentServiceTest {
     @Test
     void 교수는_본인_강의의_과제_여러개_정상조회() {
         // when
-        SliceResponse<AssignmentSimpleResponseDto> result = professorAssignmentService.getAll(testCourse.getId(), professor.getId(), 3);
+        SliceResponse<AssignmentSimpleResponseDto> result = professorAssignmentService.getAll(testCourse.getId(), professor.getId(), 0);
 
         // then
         assertThat(result.getContent())

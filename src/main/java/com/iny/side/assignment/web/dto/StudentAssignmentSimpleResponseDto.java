@@ -1,7 +1,6 @@
 package com.iny.side.assignment.web.dto;
 
 import com.iny.side.assignment.domain.entity.Assignment;
-import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.domain.entity.Submission.SubmissionStatus;
 
 import java.time.LocalDateTime;

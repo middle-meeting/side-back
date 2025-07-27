@@ -28,25 +28,23 @@ public class StudentEvaluationServiceImpl implements StudentEvaluationService {
     @Transactional(readOnly = true)
     public SummaryResponseDto getMySummary(Long studentId, Long assignmentId) {
         // 1. 과제 수행 기록 조회
-        Submission submission = submissionRepository.findByAssignmentId(assignmentId)
+        Submission submission = submissionRepository.findByStudentIdAndAssignmentId(studentId, assignmentId)
                 .orElseThrow(() -> new NotFoundException("과제 수행 기록"));
 
-        // 2. 해당 학생이 수행한 과제인지 확인
-        if (!submission.getStudent().getId().equals(studentId)) {
-            throw new ForbiddenException("forbidden.not_your_assignment");
-        }
-
-        // 3. 해당 과제 수행에 대한 교수 채점이 있는지 조회
+        // 2. 해당 과제 수행에 대한 교수 채점이 있는지 조회
         Evaluation eval = evaluationRepository.findBySubmissionId(submission.getId())
                 .orElseThrow(() -> new NotFoundException("평가"));
 
-        // 4. 처방전 조회
+        // 3. 처방전 조회
         List<Prescription> prescriptions = prescriptionRepository.findBySubmissionId(submission.getId());
+        if (prescriptions.isEmpty()) {
+            throw new NotFoundException("처방전");
+        }
 
-        List<PrescriptionResponseDto> prescriptionDtos = prescriptions.stream()
+        List<PrescriptionResponseDto> responseDtoList = prescriptions.stream()
                 .map(PrescriptionResponseDto::from)
                 .toList();
 
-        return SummaryResponseDto.from(submission, eval, prescriptionDtos);
+        return SummaryResponseDto.from(submission, eval, responseDtoList);
     }
 }

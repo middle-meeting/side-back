@@ -27,9 +27,4 @@ public class SubmissionRepositoryImpl implements SubmissionRepository {
     public Optional<Submission> findById(Long submissionId) {
         return submissionJpaRepository.findById(submissionId);
     }
-
-    @Override
-    public Optional<Submission> findByAssignmentId(Long assignmentId) {
-        return submissionJpaRepository.findByAssignmentId(assignmentId);
-    }
 }

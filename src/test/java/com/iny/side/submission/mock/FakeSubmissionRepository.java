@@ -49,11 +49,4 @@ public class FakeSubmissionRepository implements SubmissionRepository {
                 .filter(submission -> Objects.equals(submission.getId(), submissionId))
                 .findFirst();
     }
-
-    @Override
-    public Optional<Submission> findByAssignmentId(Long assignmentId) {
-        return data.stream()
-                .filter(submission -> Objects.equals(submission.getAssignment().getId(), assignmentId))
-                .findFirst();
-    }
 }

@@ -11,6 +11,4 @@ public interface SubmissionRepository {
     Optional<Submission> findByStudentIdAndAssignmentId(Long studentId, Long assignmentId);
     
     Optional<Submission> findById(Long submissionId);
-
-    Optional<Submission> findByAssignmentId(Long assignmentId);
 }
