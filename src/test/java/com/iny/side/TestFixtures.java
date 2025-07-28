@@ -80,6 +80,24 @@ public class TestFixtures {
                 .build();
     }
 
+    public static Assignment createAssignment(Long id, Course course) {
+        return Assignment.builder()
+                .id(id)
+                .title("테스트 과제")
+                .personaName("홍길동")
+                .personaAge(25)
+                .personaGender(GenderType.MALE)
+                .personaSymptom("기침")
+                .personaHistory("특이사항 없음")
+                .personaPersonality("외향적")
+                .personaDisease("감기")
+                .objective("감기 진단 연습")
+                .maxTurns(10)
+                .dueDate(LocalDateTime.of(2025, 7, 15, 14, 0))
+                .course(course)
+                .build();
+    }
+
     public static Enrollment createEnrollment(Course course, Account student) {
         return Enrollment.builder()
                 .id(1L)
