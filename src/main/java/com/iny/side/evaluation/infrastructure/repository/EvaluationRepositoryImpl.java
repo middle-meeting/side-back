@@ -21,4 +21,9 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     public Optional<Evaluation> findBySubmissionIdAndAccountId(Long submissionId, Long accountId) {
         return evaluationJpaRepository.findBySubmissionIdAndProfessorId(submissionId, accountId);
     }
+  
+    @Override
+    public Optional<Evaluation> findBySubmissionId(Long submissionId) {
+        return evaluationJpaRepository.findBySubmissionId(submissionId);
+    }
 }

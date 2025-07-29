@@ -13,6 +13,8 @@ public interface AssignmentRepository {
 
     List<Assignment> findAllByCourseId(Long courseId);
 
+    Slice<Assignment> findAllByCourseId(Long courseId, Pageable pageable);
+
     Slice<StudentAssignmentSimpleResponseDto> findAllByCourseIdAndStudentId(Long courseId, Long studentId, Pageable pageable);
 
     Assignment save(Assignment assignment);

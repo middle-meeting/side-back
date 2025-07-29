@@ -40,6 +40,13 @@ public class FakeEvaluationRepository implements EvaluationRepository {
                 .filter(evaluation -> evaluation.getSubmission().getId().equals(submissionId) && evaluation.getProfessor().getId().equals(accountId))
                 .findFirst();
     }
+  
+    @Override
+    public Optional<Evaluation> findBySubmissionId(Long submissionId) {
+        return data.stream()
+                .filter(evaluation -> evaluation.getSubmission().getId().equals(submissionId))
+                .findFirst();
+    }
 
     public Optional<Evaluation> findById(Long id) {
         return data.stream()

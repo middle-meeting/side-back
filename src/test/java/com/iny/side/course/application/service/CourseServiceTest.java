@@ -30,7 +30,7 @@ class CourseServiceTest {
 
     private Account professor;
     private Account student;
-    private Course 인체학입문;
+    private Course course;
 
     @BeforeEach
     void setUp() {
@@ -89,7 +89,7 @@ class CourseServiceTest {
                 .semester("2025-01")
                 .account(professor)
                 .build();
-        인체학입문 = Course.builder()
+        course = Course.builder()
                 .name("인체학 입문")
                 .semester("2025-01")
                 .description("인체의 구조와 기능에 대해 학습합니다.")
@@ -103,13 +103,13 @@ class CourseServiceTest {
 
         fakeCourseRepository.save(신경학);
         fakeCourseRepository.save(한의학입문);
-        인체학입문 = fakeCourseRepository.save(인체학입문);
+        course = fakeCourseRepository.save(course);
         fakeCourseRepository.save(소프트웨어공학입문);
 
         Enrollment testEnrollment = Enrollment.builder()
                 .id(1L)
                 .account(student)
-                .course(인체학입문)
+                .course(course)
                 .build();
 
         fakeEnrollmentRepository.save(testEnrollment);
@@ -118,7 +118,7 @@ class CourseServiceTest {
     @Test
     void 교수는_해당학기에_본인이_가르치는_과목을_조회_가능() {
         // when
-        List<ProfessorCoursesDto> result = courseService.getAll(professor.getId(), "2025-01");
+        List<ProfessorCoursesDto> result = courseService.getAll(professor.getId(), "2025-01", 0).getContent();
 
         // then
         // 1. 조회된 과목 수
@@ -171,10 +171,10 @@ class CourseServiceTest {
     @Test
     void 학생은_수강중인_과목의_상세정보를_조회할_수_있다() {
         // when
-        EnrolledCoursesDetailDto result = courseService.getEnrolled(student.getId(), 인체학입문.getId());
+        EnrolledCoursesDetailDto result = courseService.getEnrolled(student.getId(), course.getId());
 
         // then
-        assertThat(result.id()).isEqualTo(인체학입문.getId());
+        assertThat(result.id()).isEqualTo(course.getId());
         assertThat(result.name()).isEqualTo("인체학 입문");
         assertThat(result.semester()).isEqualTo("2025-01");
         assertThat(result.description()).isEqualTo("인체의 구조와 기능에 대해 학습합니다.");
