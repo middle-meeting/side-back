@@ -1,7 +1,7 @@
 package com.iny.side.chat.web.controller;
 
 import com.iny.side.chat.application.service.ProfessorChatService;
-import com.iny.side.chat.web.dto.ChatMessageResponseDto;
+import com.iny.side.chat.web.dto.ProfessorChatMessageResponseDto;
 import com.iny.side.common.BasicResponse;
 import com.iny.side.users.web.dto.AccountResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +22,13 @@ public class ProfessorChatController {
     private final ProfessorChatService professorChatService;
 
     @GetMapping("/{assignmentId}/students/{studentId}/chats")
-    public ResponseEntity<BasicResponse<List<ChatMessageResponseDto>>> getMessages(
+    public ResponseEntity<BasicResponse<List<ProfessorChatMessageResponseDto>>> getMessages(
             @AuthenticationPrincipal AccountResponseDto professor,
             @PathVariable Long assignmentId,
             @PathVariable Long studentId
             ) {
 
-        List<ChatMessageResponseDto> messages = professorChatService.getMessages(professor.id(), assignmentId, studentId);
+        List<ProfessorChatMessageResponseDto> messages = professorChatService.getMessages(professor.id(), assignmentId, studentId);
         return ResponseEntity.ok(BasicResponse.ok(messages));
     }
 }

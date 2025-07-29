@@ -29,6 +29,24 @@ public class ProfessorEvaluationServiceImpl implements ProfessorEvaluationServic
     private final ChatMessageRepository chatMessageRepository;
 
     @Override
+    @Transactional(readOnly = true)
+    public EvaluationResponseDto get(Long accountId, Long courseId, Long assignmentId, Long studentId) {
+        // 1. 강의에 대한 교수와 학생의 권한 체크
+        Course course = enrollmentValidationService.validateProfessorOwnsCourse(courseId, accountId);
+        enrollmentValidationService.validateStudentEnrolledInCourse(courseId, studentId);
+
+        // 2. 제출물 조회
+        Submission submission = submissionRepository.findByStudentIdAndAssignmentId(studentId, assignmentId)
+                .orElseThrow(() -> new NotFoundException("과제 제출 기록"));
+
+        // 3. 평가 내역 조회
+        Evaluation evaluation = evaluationRepository.findBySubmissionIdAndAccountId(submission.getId(), accountId)
+                .orElseThrow(() -> new NotFoundException("과제 평가 기록"));
+
+        return EvaluationResponseDto.from(evaluation);
+    }
+
+    @Override
     @Transactional
     public EvaluationResponseDto evaluate(Long accountId, Long courseId, Long assignmentId, Long studentId, EvaluationRequestDto evaluationRequestDto) {
         // 1. 강의에 대한 교수와 학생의 권한 체크

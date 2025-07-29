@@ -7,5 +7,7 @@ import java.util.Optional;
 public interface EvaluationRepository {
     Evaluation save(Evaluation evaluation);
 
+    Optional<Evaluation> findBySubmissionIdAndAccountId(Long submissionId, Long accountId);
+
     Optional<Evaluation> findBySubmissionId(Long submissionId);
 }

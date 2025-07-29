@@ -22,6 +22,16 @@ public class ProfessorEvaluationController {
 
     private final ProfessorEvaluationService professorEvaluationService;
 
+    @GetMapping(value = "/courses/{courseId}/assignments/{assignmentId}/students/{studentId}/evaluations")
+    public ResponseEntity<BasicResponse<EvaluationResponseDto>> get(
+            @AuthenticationPrincipal AccountResponseDto professor,
+            @PathVariable Long courseId,
+            @PathVariable Long assignmentId,
+            @PathVariable Long studentId) {
+
+        return ResponseEntity.ok(BasicResponse.ok(professorEvaluationService.get(professor.id(), courseId, assignmentId, studentId)));
+    }
+
     @PostMapping(value = "/courses/{courseId}/assignments/{assignmentId}/students/{studentId}/evaluations")
     public ResponseEntity<BasicResponse<EvaluationResponseDto>> evaluate(
             @AuthenticationPrincipal AccountResponseDto professor,

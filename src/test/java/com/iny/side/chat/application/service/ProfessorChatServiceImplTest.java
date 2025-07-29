@@ -5,7 +5,7 @@ import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.chat.mock.FakeAiClient;
 import com.iny.side.chat.mock.FakeChatMessageRepository;
-import com.iny.side.chat.web.dto.ChatMessageResponseDto;
+import com.iny.side.chat.web.dto.ProfessorChatMessageResponseDto;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
@@ -91,7 +91,7 @@ public class ProfessorChatServiceImplTest {
         chatService.sendMessage(student.getId(), assignment.getId(), message2);
 
         // when
-        List<ChatMessageResponseDto> messages = professorChatServiceImpl.getMessages(professor.getId(), assignment.getId(), student.getId());
+        List<ProfessorChatMessageResponseDto> messages = professorChatServiceImpl.getMessages(professor.getId(), assignment.getId(), student.getId());
 
         // then
         assertThat(messages).hasSize(4); // 학생 메시지 2개 + AI 응답 2개

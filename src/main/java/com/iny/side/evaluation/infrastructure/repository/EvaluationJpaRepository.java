@@ -6,5 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface EvaluationJpaRepository extends JpaRepository<Evaluation, Long> {
+
+    Optional<Evaluation> findBySubmissionIdAndProfessorId(Long submissionId, Long accountId);
+
     Optional<Evaluation> findBySubmissionId(Long submissionId);
 }
