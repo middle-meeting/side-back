@@ -12,6 +12,7 @@ import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.mock.FakePrescriptionRepository;
 import com.iny.side.submission.mock.FakeSubmissionRepository;
 import com.iny.side.submission.web.dto.PrescriptionRequestDto;
+import com.iny.side.submission.web.dto.ProfessorSubmissionResponseDto;
 import com.iny.side.submission.web.dto.SubmissionRequestDto;
 import com.iny.side.submission.web.dto.SubmissionResponseDto;
 import com.iny.side.users.domain.entity.Account;
@@ -92,9 +93,11 @@ public class ProfessorSubmissionServiceImplTest {
         SubmissionResponseDto response = submissionService.submit(student.getId(), assignment.getId(), requestDto);
 
         // when
-        SubmissionResponseDto submissionResponseDto = professorSubmissionService.get(professor.getId(), assignment.getId(), student.getId());
+        ProfessorSubmissionResponseDto submissionResponseDto = professorSubmissionService.get(professor.getId(), assignment.getId(), student.getId());
 
         // then
+        assertThat(submissionResponseDto.name()).isEqualTo(student.getName());
+        assertThat(submissionResponseDto.studentId()).isEqualTo(student.getStudentId());
         assertThat(submissionResponseDto.primaryDiagnosis()).isEqualTo(response.primaryDiagnosis());
         assertThat(submissionResponseDto.subDiagnosis()).isEqualTo(response.subDiagnosis());
         assertThat(submissionResponseDto.finalJudgment()).isEqualTo(response.finalJudgment());

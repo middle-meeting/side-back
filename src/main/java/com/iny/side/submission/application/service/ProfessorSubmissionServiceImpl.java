@@ -8,7 +8,7 @@ import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.domain.repository.PrescriptionRepository;
 import com.iny.side.submission.domain.repository.SubmissionRepository;
 import com.iny.side.submission.web.dto.PrescriptionResponseDto;
-import com.iny.side.submission.web.dto.SubmissionResponseDto;
+import com.iny.side.submission.web.dto.ProfessorSubmissionResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,7 @@ public class ProfessorSubmissionServiceImpl implements ProfessorSubmissionServic
 
     @Override
     @Transactional(readOnly = true)
-    public SubmissionResponseDto get(Long professorId, Long assignmentId, Long studentId) {
+    public ProfessorSubmissionResponseDto get(Long professorId, Long assignmentId, Long studentId) {
         // 1. 과제 조회
         Assignment assignment = assignmentRepository.findByAssignmentId(assignmentId)
                 .orElseThrow(() -> new NotFoundException("과제"));
@@ -45,6 +45,6 @@ public class ProfessorSubmissionServiceImpl implements ProfessorSubmissionServic
                 .map(PrescriptionResponseDto::from)
                 .toList();
 
-        return SubmissionResponseDto.from(submission, prescriptionResponseDtoList);
+        return ProfessorSubmissionResponseDto.from(submission, prescriptionResponseDtoList);
     }
 }
