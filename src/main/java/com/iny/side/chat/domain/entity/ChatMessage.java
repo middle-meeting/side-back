@@ -45,12 +45,14 @@ public class ChatMessage {
 
     @Builder
     public ChatMessage(Long id, Submission submission, Integer turnNumber, 
-                      SpeakerType speaker, String message, LocalDateTime timestamp) {
+                      SpeakerType speaker, String message, Integer score, String feedback, LocalDateTime timestamp) {
         this.id = id;
         this.submission = submission;
         this.turnNumber = turnNumber;
         this.speaker = speaker;
         this.message = message;
+        this.score = score;
+        this.feedback = feedback;
         this.timestamp = timestamp;
     }
 

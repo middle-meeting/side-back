@@ -2,10 +2,13 @@ package com.iny.side.evaluation.application.service;
 
 import com.iny.side.TestFixtures;
 import com.iny.side.assignment.domain.entity.Assignment;
+import com.iny.side.chat.domain.entity.ChatMessage;
+import com.iny.side.chat.mock.FakeChatMessageRepository;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.domain.entity.Course;
 import com.iny.side.evaluation.domain.entity.Evaluation;
 import com.iny.side.evaluation.mock.FakeEvaluationRepository;
+import com.iny.side.evaluation.web.dto.ChatFeedbackResultDto;
 import com.iny.side.evaluation.web.dto.SummaryResponseDto;
 import com.iny.side.submission.domain.entity.Prescription;
 import com.iny.side.submission.domain.entity.Submission;
@@ -24,6 +27,7 @@ class StudentEvaluationServiceImplTest {
     private FakeSubmissionRepository submissionRepository;
     private FakePrescriptionRepository prescriptionRepository;
     private StudentEvaluationService studentEvaluationService;
+    private FakeChatMessageRepository chatMessageRepository;
 
     private Account student;
     private Account professor;
@@ -38,12 +42,14 @@ class StudentEvaluationServiceImplTest {
         evaluationRepository = new FakeEvaluationRepository();
         submissionRepository = new FakeSubmissionRepository();
         prescriptionRepository = new FakePrescriptionRepository();
+        chatMessageRepository = new FakeChatMessageRepository();
 
         // 서비스 초기화
         studentEvaluationService = new StudentEvaluationServiceImpl(
                 evaluationRepository,
                 submissionRepository,
-                prescriptionRepository
+                prescriptionRepository,
+                chatMessageRepository
         );
 
         // 테스트 데이터 생성
@@ -150,4 +156,89 @@ class StudentEvaluationServiceImplTest {
                     assertThat((String) ex.getArgs()[0]).isEqualTo("처방전");
                 });
     }
+
+    @Test
+    void 특정_turn에_학생_메시지가_없으면_예외_발생() {
+        // given
+        chatMessageRepository.save(ChatMessage.builder()
+                .id(999L)
+                .submission(submission)
+                .turnNumber(999)
+                .speaker(ChatMessage.SpeakerType.AI)
+                .message("AI 메세지만 있는 turn number")
+                .build());
+
+        // when & then
+        assertThatThrownBy(() -> studentEvaluationService.getMySummary(student.getId(), assignment.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("학생 메시지가 없습니다");
+    }
+
+    @Test
+    void 특정_turn에_AI_메시지가_없으면_예외_발생() {
+        // given
+        chatMessageRepository.save(ChatMessage.builder()
+                .id(999L)
+                .submission(submission)
+                .turnNumber(999)
+                .speaker(ChatMessage.SpeakerType.STUDENT)
+                .message("STUDENT 메세지만 있는 turn number")
+                .build());
+
+        // when & then
+        assertThatThrownBy(() -> studentEvaluationService.getMySummary(student.getId(), assignment.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("AI 메시지가 없습니다");
+    }
+
+    @Test
+    void 채팅_메시지가_정상적으로_있으면_채팅피드백이_정상적으로_매핑된다() {
+        // given
+        chatMessageRepository.save(
+                ChatMessage.builder()
+                        .id(1L)
+                        .submission(submission)
+                        .turnNumber(1)
+                        .speaker(ChatMessage.SpeakerType.STUDENT)
+                        .message("언제부터 아프셨나요?")
+                        .score(4)
+                        .feedback("좋은 질문입니다.")
+                        .build()
+        );
+        chatMessageRepository.save(
+                ChatMessage.builder()
+                        .id(2L)
+                        .submission(submission)
+                        .turnNumber(1)
+                        .speaker(ChatMessage.SpeakerType.AI)
+                        .message("3일 전부터 아팠어요.")
+                        .build()
+        );
+
+        // when
+        SummaryResponseDto result = studentEvaluationService.getMySummary(student.getId(), assignment.getId());
+
+        // then
+        assertThat(result.chatFeedbacks()).hasSize(1);
+        ChatFeedbackResultDto feedback = result.chatFeedbacks().getFirst();
+        assertThat(feedback.score()).isEqualTo(4);
+        assertThat(feedback.feedback()).isEqualTo("좋은 질문입니다.");
+        assertThat(feedback.studentMessage().message()).isEqualTo("언제부터 아프셨나요?");
+        assertThat(feedback.aiMessage().message()).isEqualTo("3일 전부터 아팠어요.");
+    }
+
+    @Test
+    void 다른_학생이_요청하면_과제_수행_기록이_조회되지_않는다() {
+        // given
+        Account student1 = TestFixtures.student(99L);
+
+        // when & then
+        assertThatThrownBy(() -> studentEvaluationService.getMySummary(student1.getId(), assignment.getId()))
+                .isInstanceOf(NotFoundException.class)
+                .satisfies(exception -> {
+                    NotFoundException ex = (NotFoundException) exception;
+                    assertThat((String) ex.getArgs()[0]).isEqualTo("과제 수행 기록");
+                });
+    }
+
 }
