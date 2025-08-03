@@ -12,17 +12,24 @@ public record SummaryResponseDto(
         String primaryDiagnosis,
         String subDiagnosis,
         List<PrescriptionResponseDto> prescriptions,
-        String finalJudgment
+        String finalJudgment,
+        List<ChatFeedbackResultDto> chatFeedbacks
 ) {
 
-    public static SummaryResponseDto from(Submission submission, Evaluation eval, List<PrescriptionResponseDto> prescriptionDtos) {
+    public static SummaryResponseDto from(
+            Submission submission,
+            Evaluation eval,
+            List<PrescriptionResponseDto> prescriptionDtoList,
+            List<ChatFeedbackResultDto> chatFeedbackResultDtoList
+    ) {
         return new SummaryResponseDto(
                 eval.getScore(),
                 eval.getFeedback(),
                 submission.getPrimaryDiagnosis(),
                 submission.getSubDiagnosis(),
-                prescriptionDtos,
-                submission.getFinalJudgment()
+                prescriptionDtoList,
+                submission.getFinalJudgment(),
+                chatFeedbackResultDtoList
         );
     }
 }
