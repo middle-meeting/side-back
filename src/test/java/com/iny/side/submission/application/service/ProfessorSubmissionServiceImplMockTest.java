@@ -99,7 +99,7 @@ public class ProfessorSubmissionServiceImplMockTest {
 
         Pageable pageable = PageRequest.of(0, 12);
 
-        SubmissionDetailVo vo1 = new SubmissionDetailVo(
+        SubmissionDetailVo submissionDetailVo = new SubmissionDetailVo(
                 1L,
                 "홍길동",
                 "20171234",
@@ -113,7 +113,7 @@ public class ProfessorSubmissionServiceImplMockTest {
 
         // 서브미션 전체 조회 stub
         when(submissionRepository.findAllByCourseIdAndAssignmentId(course.getId(), assignment.getId(), pageable))
-                .thenReturn(new SliceImpl<>(List.of(vo1), pageable, false));
+                .thenReturn(new SliceImpl<>(List.of(submissionDetailVo), pageable, false));
 
         Prescription prescription1 = new Prescription(
                 1L,
@@ -152,10 +152,10 @@ public class ProfessorSubmissionServiceImplMockTest {
         var list = sliceResponse.getContent();
         assertThat(list).hasSize(1);
         var dto = list.get(0);
-        assertThat(dto.accountId()).isEqualTo(vo1.accountId());
-        assertThat(dto.studentName()).isEqualTo(vo1.studentName());
-        assertThat(dto.score()).isEqualTo(vo1.score());
-        assertThat(dto.primaryDiagnosis()).isEqualTo(vo1.primaryDiagnosis());
+        assertThat(dto.accountId()).isEqualTo(submissionDetailVo.accountId());
+        assertThat(dto.studentName()).isEqualTo(submissionDetailVo.studentName());
+        assertThat(dto.score()).isEqualTo(submissionDetailVo.score());
+        assertThat(dto.primaryDiagnosis()).isEqualTo(submissionDetailVo.primaryDiagnosis());
         assertThat(dto.prescriptions()).isEqualTo(prescriptionResponseDtoList);
     }
 }
