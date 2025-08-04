@@ -1,7 +1,6 @@
 package com.iny.side.submission.domain.vo;
 
 import com.iny.side.submission.domain.entity.Prescription;
-import com.iny.side.submission.web.dto.PrescriptionResponseDto;
 
 public record PrescriptionInfo(
         Long id,
