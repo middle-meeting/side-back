@@ -15,4 +15,5 @@ public interface EnrollmentRepository {
 
     Optional<Enrollment> findByCourseIdAndStudentId(Long courseId, Long studentId);
 
+    Long countAllByCourseId(Long courseId);
 }

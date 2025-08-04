@@ -10,4 +10,6 @@ public interface PrescriptionJpaRepository extends JpaRepository<Prescription, L
     List<Prescription> findBySubmissionId(Long submissionId);
     
     void deleteBySubmissionId(Long submissionId);
+
+    List<Prescription> findBySubmissionIdIn(List<Long> submissionIds);
 }
