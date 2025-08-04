@@ -2,6 +2,9 @@ package com.iny.side.submission.mock;
 
 import com.iny.side.submission.domain.entity.Submission;
 import com.iny.side.submission.domain.repository.SubmissionRepository;
+import com.iny.side.submission.domain.vo.SubmissionDetailVo;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,5 +51,40 @@ public class FakeSubmissionRepository implements SubmissionRepository {
         return data.stream()
                 .filter(submission -> Objects.equals(submission.getId(), submissionId))
                 .findFirst();
+    }
+
+    @Override
+    public Long countEvaluatedByCourseIdAndAssignmentId(Long courseId, Long assignmentId) {
+        return 0L;
+    }
+
+    @Override
+    public Long countNotEvaluatedByCourseIdAndAssignmentId(Long courseId, Long assignmentId) {
+        return 0L;
+    }
+
+    @Override
+    public Long countNotSubmittedByCourseIdAndAssignmentId(Long courseId, Long assignmentId) {
+        return 0L;
+    }
+
+    @Override
+    public Slice<SubmissionDetailVo> findAllByCourseIdAndAssignmentId(Long courseId, Long assignmentId, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Slice<SubmissionDetailVo> findEvaluatedByCourseIdAndAssignmentId(Long courseId, Long assignmentId, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Slice<SubmissionDetailVo> findEvaluationRequiredByCourseIdAndAssignmentId(Long courseId, Long assignmentId, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Slice<SubmissionDetailVo> findNotSubmittedByCourseIdAndAssignmentId(Long courseId, Long assignmentId, Pageable pageable) {
+        return null;
     }
 }

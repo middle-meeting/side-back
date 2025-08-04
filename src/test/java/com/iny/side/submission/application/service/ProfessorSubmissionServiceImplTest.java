@@ -47,7 +47,8 @@ public class ProfessorSubmissionServiceImplTest {
                 submissionRepository,
                 prescriptionRepository,
                 assignmentRepository,
-                enrollmentValidationService
+                enrollmentValidationService,
+                enrollmentRepository
         );
 
         submissionService = new SubmissionServiceImpl(
