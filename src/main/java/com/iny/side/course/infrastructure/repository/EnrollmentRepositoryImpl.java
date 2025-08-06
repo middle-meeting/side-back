@@ -31,4 +31,8 @@ public class EnrollmentRepositoryImpl implements EnrollmentRepository {
         return enrollmentJpaRepository.findByCourseIdAndAccountId(courseId, studentId);
     }
 
+    @Override
+    public Long countAllByCourseId(Long courseId) {
+        return enrollmentJpaRepository.countAllByCourseId(courseId);
+    }
 }

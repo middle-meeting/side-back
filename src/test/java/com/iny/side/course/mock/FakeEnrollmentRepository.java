@@ -62,4 +62,11 @@ public class FakeEnrollmentRepository implements EnrollmentRepository {
                         e.getAccount().getId().equals(studentId))
                 .findFirst();
     }
+
+    @Override
+    public Long countAllByCourseId(Long courseId) {
+        return data.stream()
+                .filter(e -> e.getCourse().getId().equals(courseId))
+                .count();
+    }
 }

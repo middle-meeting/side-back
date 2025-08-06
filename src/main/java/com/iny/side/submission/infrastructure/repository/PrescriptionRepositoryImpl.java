@@ -27,4 +27,9 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     public void deleteBySubmissionId(Long submissionId) {
         prescriptionJpaRepository.deleteBySubmissionId(submissionId);
     }
+
+    @Override
+    public List<Prescription> findBySubmissionIdIn(List<Long> submissionIds) {
+        return prescriptionJpaRepository.findBySubmissionIdIn(submissionIds);
+    }
 }

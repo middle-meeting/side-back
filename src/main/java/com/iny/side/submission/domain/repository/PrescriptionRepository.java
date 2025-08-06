@@ -11,4 +11,6 @@ public interface PrescriptionRepository {
     List<Prescription> findBySubmissionId(Long submissionId);
     
     void deleteBySubmissionId(Long submissionId);
+
+    List<Prescription> findBySubmissionIdIn(List<Long> submissionIds);
 }

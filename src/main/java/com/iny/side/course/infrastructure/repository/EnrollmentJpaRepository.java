@@ -18,4 +18,6 @@ public interface EnrollmentJpaRepository extends JpaRepository<Enrollment, Long>
     Slice<Enrollment> findAllByAccountIdAndSemester(@Param("studentId") Long studentId, @Param("semester") String semester, Pageable pageable);
 
     Optional<Enrollment> findByCourseIdAndAccountId(Long courseId, Long studentId);
+
+    Long countAllByCourseId(Long courseId);
 }
