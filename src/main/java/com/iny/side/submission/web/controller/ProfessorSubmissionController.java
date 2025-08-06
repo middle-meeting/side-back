@@ -20,7 +20,7 @@ public class ProfessorSubmissionController {
 
     private final ProfessorSubmissionService professorSubmissionService;
 
-    @GetMapping("/assignment/{assignmentId}/students/{studentId}/submissions")
+    @GetMapping("/assignments/{assignmentId}/students/{studentId}/submissions")
     public ResponseEntity<BasicResponse<ProfessorSubmissionResponseDto>> get(
             @AuthenticationPrincipal AccountResponseDto professor,
             @PathVariable Long assignmentId,
