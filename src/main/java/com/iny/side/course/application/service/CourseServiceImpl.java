@@ -2,6 +2,7 @@ package com.iny.side.course.application.service;
 
 import com.iny.side.common.SliceResponse;
 import com.iny.side.common.exception.NotFoundException;
+import com.iny.side.course.domain.entity.Course;
 import com.iny.side.course.domain.entity.Enrollment;
 import com.iny.side.course.domain.repository.CourseRepository;
 import com.iny.side.course.domain.repository.EnrollmentRepository;
@@ -27,10 +28,15 @@ public class CourseServiceImpl implements CourseService {
     private final EnrollmentValidationService enrollmentValidationService;
 
     @Override
-    public List<ProfessorCoursesDto> getAll(Long professorId, String semester) {
-        return courseRepository.findAllByAccountIdAndSemester(professorId, semester).stream()
+    public SliceResponse<ProfessorCoursesDto> getAll(Long professorId, String semester, int page) {
+        Pageable pageable = PageRequest.of(page, 12);
+        Slice<Course> courseSlice = courseRepository.findAllByAccountIdAndSemester(professorId, semester, pageable);
+
+        List<ProfessorCoursesDto> content = courseSlice.getContent().stream()
                 .map(ProfessorCoursesDto::from)
                 .toList();
+
+        return SliceResponse.of(content, page, 12, courseSlice.hasNext());
     }
 
     @Override

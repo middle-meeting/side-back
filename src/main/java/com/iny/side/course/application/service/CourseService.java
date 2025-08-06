@@ -8,7 +8,7 @@ import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import java.util.List;
 
 public interface CourseService {
-    List<ProfessorCoursesDto> getAll(Long professorId, String semester);
+    SliceResponse<ProfessorCoursesDto> getAll(Long professorId, String semester, int page);
 
     List<EnrolledCoursesSimpleDto> getAllEnrolled(Long studentId, String semester);
 

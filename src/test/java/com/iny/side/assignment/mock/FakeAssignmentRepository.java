@@ -66,6 +66,20 @@ public class FakeAssignmentRepository implements AssignmentRepository {
     }
 
     @Override
+    public Slice<Assignment> findAllByCourseId(Long courseId, Pageable pageable) {
+        List<Assignment> filtered =  data.stream()
+                .filter(assignment -> assignment.getCourse() != null &&
+                        Objects.equals(assignment.getCourse().getId(), courseId))
+                .toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+
+        List<Assignment> assignmentContent = start < filtered.size() ? filtered.subList(start, end) : new ArrayList<>();
+        boolean hasNext = end < filtered.size();
+        return new SliceImpl<>(assignmentContent, pageable, hasNext);
+    }
+
+    @Override
     public Slice<StudentAssignmentSimpleResponseDto> findAllByCourseIdAndStudentId(Long courseId, Long studentId, Pageable pageable) {
         List<Assignment> filtered = data.stream()
                 .filter(assignment -> assignment.getCourse() != null &&

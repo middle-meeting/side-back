@@ -1,6 +1,7 @@
 package com.iny.side.submission.web.dto;
 
 import com.iny.side.submission.domain.entity.Prescription;
+import com.iny.side.submission.domain.vo.PrescriptionInfo;
 
 public record PrescriptionResponseDto(
     Long id,
@@ -17,6 +18,16 @@ public record PrescriptionResponseDto(
             prescription.getDosage(),
             prescription.getFrequency(),
             prescription.getDuration()
+        );
+    }
+
+    public static PrescriptionResponseDto from(PrescriptionInfo prescriptionInfo) {
+        return new PrescriptionResponseDto(
+                prescriptionInfo.id(),
+                prescriptionInfo.drugName(),
+                prescriptionInfo.dosage(),
+                prescriptionInfo.frequency(),
+                prescriptionInfo.duration()
         );
     }
 }

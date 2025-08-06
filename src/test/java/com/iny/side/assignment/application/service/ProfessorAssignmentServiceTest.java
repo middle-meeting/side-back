@@ -1,11 +1,11 @@
 package com.iny.side.assignment.application.service;
 
-import com.iny.side.users.mock.FakeUserRepository;
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.mock.FakeAssignmentRepository;
 import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.ProfessorAssignmentDetailResponseDto;
+import com.iny.side.common.SliceResponse;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
@@ -14,11 +14,11 @@ import com.iny.side.course.mock.FakeCourseRepository;
 import com.iny.side.course.mock.FakeEnrollmentValidationService;
 import com.iny.side.users.domain.Role;
 import com.iny.side.users.domain.entity.Account;
+import com.iny.side.users.mock.FakeUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -127,10 +127,10 @@ class ProfessorAssignmentServiceTest {
     @Test
     void 교수는_본인_강의의_과제_여러개_정상조회() {
         // when
-        List<AssignmentSimpleResponseDto> result = professorAssignmentService.getAll(testCourse.getId(), professor.getId());
+        SliceResponse<AssignmentSimpleResponseDto> result = professorAssignmentService.getAll(testCourse.getId(), professor.getId(), 0);
 
         // then
-        assertThat(result)
+        assertThat(result.getContent())
                 .hasSize(3)
                 .extracting(AssignmentSimpleResponseDto::title)
                 .containsExactlyInAnyOrder("심장질환 케이스", "소화기 질환", "상세보기용 과제");

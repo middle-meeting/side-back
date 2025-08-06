@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,5 +27,10 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     @Override
     public Integer findMaxTurnNumberBySubmissionId(Long submissionId) {
         return chatMessageJpaRepository.findMaxTurnNumberBySubmissionId(submissionId);
+    }
+
+    @Override
+    public Optional<ChatMessage> findById(Long chatMessageId) {
+        return chatMessageJpaRepository.findById(chatMessageId);
     }
 }
