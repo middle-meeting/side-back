@@ -2,22 +2,18 @@ package com.iny.side.assignment.application.service;
 
 import com.iny.side.assignment.domain.entity.Assignment;
 import com.iny.side.assignment.domain.repository.AssignmentRepository;
-import com.iny.side.assignment.web.dto.AssignmentSimpleResponseDto;
 import com.iny.side.assignment.web.dto.StudentAssignmentDetailResponseDto;
 import com.iny.side.assignment.web.dto.StudentAssignmentSimpleResponseDto;
 import com.iny.side.common.SliceResponse;
 import com.iny.side.common.exception.ForbiddenException;
 import com.iny.side.common.exception.NotFoundException;
 import com.iny.side.course.application.service.EnrollmentValidationService;
-import com.iny.side.submission.domain.entity.Submission;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Builder
