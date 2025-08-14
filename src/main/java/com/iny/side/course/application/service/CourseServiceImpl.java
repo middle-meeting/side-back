@@ -8,6 +8,7 @@ import com.iny.side.course.domain.repository.CourseRepository;
 import com.iny.side.course.domain.repository.EnrollmentRepository;
 import com.iny.side.course.web.dto.EnrolledCoursesDetailDto;
 import com.iny.side.course.web.dto.EnrolledCoursesSimpleDto;
+import com.iny.side.course.web.dto.ProfessorCoursesDetailDto;
 import com.iny.side.course.web.dto.ProfessorCoursesDto;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -72,5 +73,15 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new NotFoundException("수강신청 정보"));
 
         return EnrolledCoursesDetailDto.from(enrollment);
+    }
+
+    @Override
+    public ProfessorCoursesDetailDto getCourse(Long professorId, Long courseId) {
+        courseRepository.findById(courseId)
+                .orElseThrow(() -> new NotFoundException("과목"));
+
+        Course course = enrollmentValidationService.validateProfessorOwnsCourse(courseId, professorId);
+
+        return ProfessorCoursesDetailDto.from(course);
     }
 }
