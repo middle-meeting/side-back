@@ -6,14 +6,14 @@ import com.iny.side.submission.domain.entity.Submission.SubmissionStatus;
 import java.time.LocalDateTime;
 
 public record StudentAssignmentSimpleResponseDto(Long id, String title, LocalDateTime dueDate, String objective,
-                                                 SubmissionStatus status) {
+                                                 String status) {
     public static StudentAssignmentSimpleResponseDto from(Assignment assignment, SubmissionStatus status) {
         return new StudentAssignmentSimpleResponseDto(
                 assignment.getId(),
                 assignment.getTitle(),
                 assignment.getDueDate(),
                 assignment.getObjective(),
-                status != null ? status : SubmissionStatus.NOT_STARTED
+                status != null ? status.toString() : "NOT_STARTED"
         );
     }
 }

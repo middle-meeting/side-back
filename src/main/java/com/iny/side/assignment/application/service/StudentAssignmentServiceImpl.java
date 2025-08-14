@@ -29,17 +29,14 @@ public class StudentAssignmentServiceImpl implements StudentAssignmentService {
 
     @Override
     public SliceResponse<StudentAssignmentSimpleResponseDto> getAll(Long courseId, Long studentId, int page) {
+        // 1. 권한 검증
         enrollmentValidationService.validateStudentEnrolledInCourse(courseId, studentId);
+        // 2. 페이징 정보 생성
         Pageable pageable = PageRequest.of(page, 12);
+        // 3. repository 에서 과제의 상태가 결정된 상태로 넘어옴
         Slice<StudentAssignmentSimpleResponseDto> assignmentSlice = assignmentRepository.findAllByCourseIdAndStudentId(courseId, studentId, pageable);
 
-        List<StudentAssignmentSimpleResponseDto> content = assignmentSlice.getContent().stream()
-                .map(dto -> dto.status() == null ?
-                    new StudentAssignmentSimpleResponseDto(dto.id(), dto.title(), dto.dueDate(), dto.objective(), Submission.SubmissionStatus.NOT_STARTED) :
-                    dto)
-                .toList();
-
-        return SliceResponse.of(content, page, 12, assignmentSlice.hasNext());
+        return SliceResponse.from(assignmentSlice);
     }
 
     @Override
