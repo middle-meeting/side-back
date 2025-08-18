@@ -1,7 +1,6 @@
 package com.iny.side.submission.domain.entity;
 
 import com.iny.side.assignment.domain.entity.Assignment;
-import com.iny.side.chat.domain.entity.ChatMessage;
 import com.iny.side.submission.exception.InvalidSubmissionDataException;
 import com.iny.side.users.domain.entity.Account;
 import jakarta.persistence.*;
@@ -11,8 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -49,10 +46,10 @@ public class Submission {
     private SubmissionStatus status = SubmissionStatus.DRAFT;
 
     @Builder
-    public Submission(Long id, Account student, Assignment assignment, 
-                     String primaryDiagnosis, String subDiagnosis, 
-                     String finalJudgment, LocalDateTime submittedAt, 
-                     SubmissionStatus status) {
+    public Submission(Long id, Account student, Assignment assignment,
+                      String primaryDiagnosis, String subDiagnosis,
+                      String finalJudgment, LocalDateTime submittedAt,
+                      SubmissionStatus status) {
         this.id = id;
         this.student = student;
         this.assignment = assignment;
@@ -85,7 +82,7 @@ public class Submission {
 
     public enum SubmissionStatus {
         NOT_STARTED, // 진행전
-        DRAFT,      // 진행 중
-        SUBMITTED   // 제출 완료
+        DRAFT,       // 진행 중
+        SUBMITTED    // 제출 완료
     }
 }
