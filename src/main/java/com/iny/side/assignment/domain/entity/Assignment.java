@@ -60,7 +60,7 @@ public class Assignment {
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(name = "timestamp", nullable = false, columnDefinition = "datetime(6) default current_timestamp(6)")
     private LocalDateTime timestamp;
 
     @Builder
