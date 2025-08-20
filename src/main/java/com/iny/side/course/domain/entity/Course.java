@@ -31,13 +31,29 @@ public class Course {
     @JoinColumn(name = "professor_id")
     private Account account;
 
+    @Column(name = "total_students")
+    private Integer totalStudents;
+
+    @Column(name = "schedule")
+    private String schedule;
+
+    @Column(name = "classroom")
+    private String classroom;
+
+    @Column(name = "department")
+    private String department;
+
     @Builder
-    public Course(Long id, String name, String semester, String description, Account account) {
+    public Course(Long id, String name, String semester, String description, Account account, Integer totalStudents, String schedule, String classroom, String department) {
         this.id = id;
         this.name = name;
         this.semester = semester;
         this.description = description;
         this.account = account;
+        this.totalStudents = totalStudents;
+        this.schedule = schedule;
+        this.classroom = classroom;
+        this.department = department;
     }
 
     public void validateOwner(Long professorId) {
