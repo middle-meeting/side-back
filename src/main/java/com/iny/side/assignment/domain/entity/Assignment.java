@@ -2,7 +2,6 @@ package com.iny.side.assignment.domain.entity;
 
 import com.iny.side.assignment.domain.vo.AssignmentInfo;
 import com.iny.side.assignment.exception.InvalidAssignmentDueDateException;
-import com.iny.side.assignment.web.dto.AssignmentCreateDto;
 import com.iny.side.common.domain.GenderType;
 import com.iny.side.course.domain.entity.Course;
 import jakarta.persistence.*;
@@ -61,8 +60,11 @@ public class Assignment {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @Column(name = "timestamp", nullable = false, columnDefinition = "datetime(6) default current_timestamp(6)")
+    private LocalDateTime timestamp;
+
     @Builder
-    public Assignment(Long id, String title, String personaName, Integer personaAge, GenderType personaGender, String personaSymptom, String personaHistory, String personaPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Course course) {
+    public Assignment(Long id, String title, String personaName, Integer personaAge, GenderType personaGender, String personaSymptom, String personaHistory, String personaPersonality, String personaDisease, String objective, Integer maxTurns, LocalDateTime dueDate, Course course, LocalDateTime timestamp) {
         this.id = id;
         this.title = title;
         this.personaName = personaName;
@@ -76,6 +78,7 @@ public class Assignment {
         this.maxTurns = maxTurns;
         this.dueDate = dueDate;
         this.course = course;
+        this.timestamp = timestamp;
     }
 
     public static Assignment create(Course course, AssignmentInfo info) {
@@ -96,6 +99,7 @@ public class Assignment {
                 .maxTurns(info.maxTurns())
                 .dueDate(info.dueDate())
                 .course(course)
+                .timestamp(LocalDateTime.now())
                 .build();
     }
 }

@@ -43,7 +43,7 @@ public interface SubmissionJpaRepository extends JpaRepository<Submission, Long>
             on s.student.id = e.account.id
            and s.assignment.id = :assignmentId
          where c.id = :courseId
-           and s.id is null
+           and (s.id is null or s.status <> "SUBMITTED")
     """)
     Long countNotSubmittedByCourseIdAndAssignmentId(@Param("courseId") Long courseId, @Param("assignmentId") Long assignmentId);
 
@@ -124,6 +124,7 @@ public interface SubmissionJpaRepository extends JpaRepository<Submission, Long>
      left join Evaluation ev
             on ev.submission = s
          where e.course.id = :courseId
+           and s.status = "SUBMITTED"
            and ac.role = "STUDENT"
            and ev is null
     """)
@@ -151,7 +152,7 @@ public interface SubmissionJpaRepository extends JpaRepository<Submission, Long>
            and s.assignment.id = :assignmentId
          where e.course.id = :courseId
            and ac.role = "STUDENT"
-           and s is null
+           and (s is null or s.status <> "SUBMITTED")
     """)
     Slice<SubmissionDetailVo> findNotSubmittedByCourseIdAndAssignmentId(Long courseId, Long assignmentId, Pageable pageable);
 }

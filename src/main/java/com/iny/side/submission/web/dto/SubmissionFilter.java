@@ -27,7 +27,7 @@ public enum SubmissionFilter {
     public static SubmissionFilter from(SubmissionDetailVo submissionDetailVo) {
         if (!Objects.isNull(submissionDetailVo.score())) {
             return GRADED;
-        } else if (!Objects.isNull(submissionDetailVo.submissionId())) {
+        } else if (!Objects.isNull(submissionDetailVo.submissionId()) && !Objects.isNull(submissionDetailVo.submittedAt())) {
             return NEEDS_GRADING;
         } else {
             return NOT_SUBMITTED;
